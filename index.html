@@ -1,85 +1,83 @@
 <html>
     <head>
-        <link href="stupid.css" rel="stylesheet" type="text/css"/>
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+
+        <!-- Optional theme -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+        <!-- Latest compiled and minified JavaScript -->
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+          <!--[if lt IE 9]>
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/html5shiv/3.7.3/html5shiv.js"></script>
+          <![endif]-->
         <style>
             .main_title {
                 font-family: sans-serif;
                 text-align: center;
+                font-weight: bold;
+            }
+            .title-div {
+                background:none;
             }
             
-            .title_div {
-                padding: 10px;
-                border-style: solid;
-                border-color: black;
+            .center {
+                text-align:center;
             }
-            
-            .main_content {
-                padding-left: 150px;
-                padding-right: 150px;
-                padding-top: 30px;
-                padding-bottom: 30px;
-            }
-            
-            .info_footer {
-                padding: 20px;
-                text-align: center;
-                font-family: sans-serif;
-            }
-            
-            .content_bar {
-                padding-left: 75px;
-                padding-right: 75px;
-            }
-            
-            body {
+            .main {
+                font-size:1.65rem;
             }
         </style>
     </head>
     
     <body>
-        <div class="title_div">
+        <div class="jumbotron title-div">
             <h1 class="main_title">Injuries in the National Hockey League</h1>
         </div>
         
-        <div class="main_content">
+        <div class="main container">
             <p> Ice hockey is one of the more dangerous sports out there. Players have to wear full body protection and the rate of injuries is still high when compared to other sports. </p>
             <p>This visualization will examine the rate and severity of different injuries and will attempt to discover how the increased protection from modern protective equipment has affected these factors.</p>
         </div>
         
-        <div class="content_bar container">
-            <div class="third compressible">
-                <h6>Articles</h6>
+        <div class="container">
+            
+            <div class="col-md-4">
+                <h4>Articles</h4>
                 <ul>
-                    <li>On the N.H.L.’s Playoff Ice, Injuries Are Risen Above. <a href="https://www.nytimes.com/2017/05/15/sports/hockey/nhl-playoffs-injuries-erik-karlsson-alex-ovechkin.html">link</a></li>
-                    <li>Injuries Cost NHL $218M a Year in Lost Salaries, a Wallop to Bottom Line: Study. <a href="http://www.thehockeynews.com/news/article/injuries-cost-nhl-218m-a-year-in-lost-salaries-a-wallop-to-bottom-line-study">link</a></li>
+                    <li><a href="https://www.nytimes.com/2017/05/15/sports/hockey/nhl-playoffs-injuries-erik-karlsson-alex-ovechkin.html">On the N.H.L.’s Playoff Ice, Injuries Are Risen Above. </a></li>
+                    <li><a href="http://www.thehockeynews.com/news/article/injuries-cost-nhl-218m-a-year-in-lost-salaries-a-wallop-to-bottom-line-study">Injuries Cost NHL $218M a Year in Lost Salaries, a Wallop to Bottom Line: Study. </a></li>
                     <li><a href="http://www.healthgeomatics.com/predicting-nhl-hockey-injuries/">Health Genomics Hockey Injury Prediction Article</a></li>
-                    <li><a href="https://www.theglobeandmail.com/life/health-and-fitness/health/when-it-comes-to-brain-injuries-how-dangerous-is-youthhockey/article36595825/">When It Comes to Brain Injuries, How Dangerous Is Youth Hockey</a></li>
+                    <li><a href="https://www.theglobeandmail.com/life/health-and-fitness/health/when-it-comes-to-brain-injuries-how-dangerous-is-youthhockey/article36595825/">When It Comes to Brain Injuries, How Dangerous Is Youth Hockey?</a></li>
                 </ul>
             </div>
-            <div class="third compressible">
-                <h6>Related Visualizations</h6>
+            
+            <div class="col-md-4">
+                <h4>Related Visualizations</h4>
                 <ul>
-                    <li>NHL Injury Vis. <a href="http://nhlinjuryviz.blogspot.com/2018/04/201718-NHL-injury-list.html">link</a></li>
-                    <li>Which Equipment Causes The Most Sports Injuries? <a href="https://venngage.com/blog/sports-injury-infographic/">link</a></li>
+                    <li><a href="http://nhlinjuryviz.blogspot.com/2018/04/201718-NHL-injury-list.html">NHL Injury Vis. </a></li>
+                    <li><a href="https://venngage.com/blog/sports-injury-infographic/">Which Equipment Causes The Most Sports Injuries? </a></li>
                     <li><a href="http://nhlinjuryviz.blogspot.com/2017/10/201718-team-injury-breakdowns.html">2017/2018 Hockey Injuries</a></li>
                 </ul>
             </div>
-            <div class="third compressible">
-                <h6>Data</h6>
+            
+            <div class="col-md-4">
+                <h4>Data</h4>
                 <ul>
-                    <li>NHL Injury Data, 2009-2018. <a href="https://docs.google.com/spreadsheets/d/1f16CqNDHyu-v-Fyxqf237KkIqbWwnNJ4lH7kQqR7rF8/edit?usp=sharing">link</a></li>
+                    <li><a href="https://docs.google.com/spreadsheets/d/1f16CqNDHyu-v-Fyxqf237KkIqbWwnNJ4lH7kQqR7rF8/edit?usp=sharing">NHL Injury Data, 2009-2018. </a></li>
                     <li><a href="http://nhlinjuryviz.blogspot.com/2015/11/nhl-injury-database.html">sortable injury database</a></li>
                     <li><a href="http://developers.stattleship.com/#what-we-ask">Sattleship API</a></li>
                     <li><a href="http://www.hockeyabstract.com/testimonials">Hockey Goalie Injury Data</a></li>
                     <li><a href="http://www.hockeyabstract.com/thoughts/completelistofhockeyanalyticsdataresources">Hockey Related Data</a></li>
                 </ul>
             </div>
-        </div>
-        
-        <div class="info_footer">
-            Thomas Bryant<br>
-            tcbryant@ucsc.edu<br>
-            <a href="https://github.com/tccbryant/HockeyInjuryVis">Github</a>
+
         </div>
     </body>
+    <footer>
+        <div class="page-footer center">
+            Thomas Bryant, Matthew Shehan, Joseph Castelan<br>
+            tcbryant@ucsc.edu, mshehan@ucsc.edu, <br>
+            <a href="https://github.com/tccbryant/HockeyInjuryVis">Github</a>
+        </div>
+    </footer>
 </html>
