@@ -10,7 +10,7 @@ var margin = {top: 10, right: 40, bottom: 150, left: 70},
     height = 500 - margin.top - margin.bottom;
 
 //define the svg
-var svg = d3.select(".chart").append("svg") //will need to change body to something else
+var svg = d3.select(".bar-chart").append("svg") //will need to change body to something else
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
