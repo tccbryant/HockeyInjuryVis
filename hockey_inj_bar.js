@@ -1,10 +1,7 @@
 /*
 TODO:
-2 - Rescale the color scale to actually see the more dense areas of severity
-3 - color legend
-4 - label axes
-5 - can select bars to grey out other bars
-6 - 2 modes, stacked bar and severity
+1 - can select bars to grey out other bars
+2 - 2 modes, stacked bar and severity
 */
 
 //define the margins
@@ -47,7 +44,9 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
     
     d = (cMax - cMin)/5;
     
-    colorDomain = [cMin + 1*d, cMin + 2*d, cMin + 3*d, cMin + 4*d, cMin + 5*d];
+    colorDomain = [8, 9, 12, 13, 15];
+    
+    console.log(colorDomain);
     
     //update the domains of the scales with the data
     xScale.domain(data.map(function(d) { return d.type; }));
@@ -92,4 +91,43 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
         .attr("class", "y axis")
         .call(yAxis)
         .selectAll("text");
+    
+    svg.append("text")
+        .attr("transform", "rotate(-90)")
+        .attr("y", -1*margin.left)
+        .attr("x", -1*(height/2))
+        .attr("dy", "1.5em")
+        .style("text-anchor", "middle")
+        .style("font-family", "sans-serif")
+        .text("Number of Injuries");
+    
+    var ls_w = 40, ls_h = 20;
+    
+    var legend = svg.selectAll("g.legend")
+        .data(colorDomain)
+        .enter().append("g")
+        .attr("class", "legend");
+    
+    legend.append("rect")
+        .attr("x", function(d,i) { return width - (i*ls_w) - 50; })
+        .attr("y", function(d, i){ return 80 - (ls_h) - 2*ls_h; })
+        .attr("width", ls_w)
+        .attr("height", ls_h)
+        .style("fill", function(d, i) {
+            return cScale(d-1); 
+        })
+        .attr("stroke", "#000000");
+    
+    legend.append("text")
+        .attr("x", function(d, i){ return width - (i*ls_w) - 35; })
+        .attr("y", function(d, i){ return 80 - (ls_h) - ls_h + 15; })
+        .style("text-align", "middle")
+        .text(function(d, i){ return colorDomain[i]; });
+    
+    svg.append("text")
+        .attr("x", width - 212)
+        .attr("y", 10)
+        .style("font-family", "sans-serif")
+        .style("font-size", "11pt")
+        .text("Injury Severity (Games Missed)")
 })
