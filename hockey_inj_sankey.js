@@ -1,11 +1,12 @@
-//source: https://bl.ocks.org/d3noob/013054e8d7807dff76247b81b0e29030
+//source: 
+//-https://bl.ocks.org/d3noob/013054e8d7807dff76247b81b0e29030
 //TODO: 
-//  -use the actual data
 //  -node color
-//  -ribbon color?
+//  -ribbon color
+//  -do something when a node is clicked
 
 
-var units = "Widgets";
+var units = "injuries";
 
 // set the dimensions and margins of the graph
 var margin = {top: 10, right: 10, bottom: 10, left: 10},
@@ -28,15 +29,11 @@ var svg = d3.select("body").append("svg")
 // Set the sankey diagram properties
 var sankey = d3.sankey()
     .nodeWidth(75)
-    .nodePadding(10)
     .size([width, height]);
 
 var path = sankey.link();
 
-var severity_count=[0,0,0,0,0]; //b/c 5 severity levels
-var highest_severity=0;
-var lowest_severity=10;
-var translation = ["8","9","12","13","15",
+var translation = ["8","9","12","13","15", //based on sev_scale
                    "F","G","D",
                    "Lower body", "Upper body","Leg", "Head", "Foot", "Hand", "Groin", "Shoulder", "Back", "Face", "Torso", "Arm", "Neck"]
 //load csv data
@@ -49,18 +46,8 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
         d.type = d.injury_type;
         d.number = +d.num_injuries;
         d.severity = +d.total_severity / +d.num_injuries;
-        if( d.severity > highest_severity){
-            //console.log(d)
-            //console.log( i , " has a higher severity (", d.severity,")");
-            highest_severity=d.severity;
-        }else if( d.severity < lowest_severity){
-            //console.log( i , " has a lower severity (", d.severity,")");
-            lowest_severity=d.severity;
-        }
     });
     console.log( data[0]);
-    //console.log( "highest = ",highest_severity, " \n lowest = ", lowest_severity )
-    
     // load the json data
     d3.json("sankey.json", function(error, graph) {
         for (var i = 0; i < data.length; i++) {
@@ -94,8 +81,6 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
             }
         }
       
-        
-    //console.log(graph)
     sankey
         .nodes(graph.nodes)
         .links(graph.links)
