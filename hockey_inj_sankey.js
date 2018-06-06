@@ -12,9 +12,9 @@ var units = "injuries";
 var colorRange = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15', '#8dd3c7', '#ffffb3', '#bebada', '#80b1d3'];
 
 // set the dimensions and margins of the graph
-var margin = {top: 10, right: 10, bottom: 10, left: 10},
+var margin = {top: 30, right: 10, bottom: 10, left: 10},
     width = window.innerWidth -50 - margin.left - margin.right,
-    height = window.innerHeight- margin.top - margin.bottom;
+    height = window.innerHeight -25- margin.top - margin.bottom;
 
 // format variables
 var formatNumber = d3.format(",.0f"),    // zero decimal places
@@ -29,9 +29,10 @@ var svg = d3.select("body").append("svg")
     .attr("transform", 
           "translate(" + margin.left + "," + margin.top + ")");
 
+var node_width = 75;
 // Set the sankey diagram properties
 var sankey = d3.sankey()
-    .nodeWidth(75)
+    .nodeWidth(node_width)
     .size([width, height]);
 
 var path = sankey.link();
@@ -98,6 +99,9 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
     .enter().append("path")
         .attr("class", "link")
         .attr("d", path)
+        .attr("id", function(d) {
+            return "link"+ d.source.node+"_"+d.target.node;
+        })
         .style("stroke-width", function(d) { return Math.max(0, d.dy); });
         //.sort(function(a, b) { return b.dy - a.dy; });
 
@@ -107,14 +111,13 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
             return d.source.name + " → " + 
                 d.target.name + "\n" + format(d.value); });
 
-    var min_height = 0
     // add in the nodes
     var node = svg.append("g").selectAll(".node")
         .data(graph.nodes)
     .enter().append("g")
         .attr("class", "node")
         .attr("transform", function(d) { 
-            return "translate(" + d.x + "," + d.y + ")"; })
+            return "translate(" + d.x + "," + d.y + ")"; });
         /*.call(d3.drag()
         .subject(function(d) {
             return d;
@@ -128,12 +131,16 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
     node.append("rect")
         .attr("height", function(d) { return d.dy; })
         .attr("width", sankey.nodeWidth())
+        .attr("id", function(d) {
+            return "node"+ d.node;
+        })
         .style("fill", function(d) { 
-            console.log(d)
+            //console.log(d)
             return d.color = get_color(d.node);})
             //return d.color = color(d.name.replace(/ .*/, "")); })
         .style("stroke", function(d) { 
             return d3.rgb(d.color).darker(2); })
+        .on("click", color_selected_node)
         .append("title")
         .text(function(d) { 
             return d.name + "\n" + format(d.value); });
@@ -150,6 +157,24 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
       .attr("x", 6 + sankey.nodeWidth())
       .attr("text-anchor", "start");
 
+    var col_label_height = -10
+    //add the column labels
+    svg.append("text")
+        .attr("x", node_width/2)
+        .attr("y", col_label_height)
+        .text("Severity")
+        .attr("text-anchor", "middle");
+    svg.append("text")
+        .attr("x", width/2)
+        .attr("y", col_label_height)
+        .text("Body Part")
+        .attr("text-anchor", "middle");
+    svg.append("text")
+        .attr("x", width - node_width/2)
+        .attr("y", col_label_height)
+        .text("Position")
+        .attr("text-anchor", "middle");
+    
     // the function for moving the nodes
     function dragmove(d) {
     d3.select(this)
@@ -161,6 +186,49 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
                  ) + ")");
     sankey.relayout();
     link.attr("d", path);
+    }
+        
+    function color_selected_node(d){
+        //just showing that we selected for debugging purposes
+        var debug_color = "#bc80bd"
+        d3.select(this)
+            .style("fill", debug_color);
+        /*console.log(d.node);
+        //console.log(graph.links[0])
+        d3.select("#node0")
+            .style("fill", "green");
+        d3.select("#link0_8")
+            .style("stroke", "green")
+            .style("stroke-opacity", .5);
+        d3.select("#link8_5")
+            .style("stroke", "green")
+            .style("stroke-opacity", .5);*/
+        
+        //coloring connected nodes and links based on what we clicked
+        console.log(graph.links[0].value)
+        if(d.node>=8){ // body part nodes
+            for(var j = 0; j < graph.links.length; j++){
+                if( graph.links[j].source.node==d.node && graph.links[j].value !=0){
+                    //right half of the sankey
+                    var dest =graph.links[j].target.node
+                    var linkID = "#link"+d.node+"_"+dest
+                    d3.select(linkID)
+                        .style("stroke", debug_color)
+                        .style("stroke-opacity", .60);
+                    d3.select("#node"+dest)
+                        .style("fill", debug_color);
+                }else if(graph.links[j].target.node==d.node && graph.links[j].value !=0){
+                    //left half of the sankey
+                    var src =graph.links[j].source.node
+                    var linkID = "#link"+src+"_"+d.node
+                    d3.select(linkID)
+                        .style("stroke", debug_color)
+                        .style("stroke-opacity", .60);
+                    d3.select("#node"+src)
+                        .style("fill", debug_color);
+                }
+            }
+        }
     }
     });
 });
@@ -180,9 +248,9 @@ function sev_scale(num){
 }
 
 function get_color(num){
-    if( num <= 8){
+    if( num <= 8){ //for severity and position colors
         return colorRange[num]
-    }else{
+    }else{ //for body part colors
         return "#80b1d3"
     }
 }
