@@ -8,6 +8,9 @@
 
 var units = "injuries";
 
+//color scale data
+var colorRange = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15', '#8dd3c7', '#ffffb3', '#bebada', '#80b1d3'];
+
 // set the dimensions and margins of the graph
 var margin = {top: 10, right: 10, bottom: 10, left: 10},
     width = window.innerWidth -50 - margin.left - margin.right,
@@ -111,11 +114,6 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
     .enter().append("g")
         .attr("class", "node")
         .attr("transform", function(d) { 
-            //console.log(d);
-            /*if( d.node < 5){
-                d.y = min_height
-                min_height+= d.dy + 8
-            }*/
             return "translate(" + d.x + "," + d.y + ")"; })
         .call(d3.drag()
         .subject(function(d) {
@@ -128,15 +126,17 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
 
     // add the rectangles for the nodes
     node.append("rect")
-      .attr("height", function(d) { return d.dy; })
-      .attr("width", sankey.nodeWidth())
-      .style("fill", function(d) { 
-          return d.color = color(d.name.replace(/ .*/, "")); })
-      .style("stroke", function(d) { 
-          return d3.rgb(d.color).darker(2); })
-    .append("title")
-      .text(function(d) { 
-          return d.name + "\n" + format(d.value); });
+        .attr("height", function(d) { return d.dy; })
+        .attr("width", sankey.nodeWidth())
+        .style("fill", function(d) { 
+            console.log(d)
+            return d.color = get_color(d.node);})
+            //return d.color = color(d.name.replace(/ .*/, "")); })
+        .style("stroke", function(d) { 
+            return d3.rgb(d.color).darker(2); })
+        .append("title")
+        .text(function(d) { 
+            return d.name + "\n" + format(d.value); });
 
     // add in the title for the nodes
     node.append("text")
@@ -176,5 +176,13 @@ function sev_scale(num){
         return 3;
     }else{
         return 4
+    }
+}
+
+function get_color(num){
+    if( num <= 8){
+        return colorRange[num]
+    }else{
+        return "#80b1d3"
     }
 }
