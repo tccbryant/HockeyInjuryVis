@@ -50,6 +50,9 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
     console.log( data[0]);
     // load the json data
     d3.json("sankey.json", function(error, graph) {
+        /*graph.nodes.forEach(function(d,i){
+           console.log(d); 
+        });*/
         for (var i = 0; i < data.length; i++) {
             var type = data[i].type;
             var node_num = translation.indexOf(type);
@@ -80,11 +83,11 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
                 }
             }
         }
-      
+    
     sankey
         .nodes(graph.nodes)
         .links(graph.links)
-        .layout(32);
+        .layout(0);
 
     // add in the links
     var link = svg.append("g").selectAll(".link")
@@ -92,8 +95,8 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
     .enter().append("path")
         .attr("class", "link")
         .attr("d", path)
-        .style("stroke-width", function(d) { return Math.max(0, d.dy); })
-        .sort(function(a, b) { return b.dy - a.dy; });
+        .style("stroke-width", function(d) { return Math.max(0, d.dy); });
+        //.sort(function(a, b) { return b.dy - a.dy; });
 
     // add the link titles
     link.append("title")
@@ -101,12 +104,18 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
             return d.source.name + " → " + 
                 d.target.name + "\n" + format(d.value); });
 
+    var min_height = 0
     // add in the nodes
     var node = svg.append("g").selectAll(".node")
         .data(graph.nodes)
     .enter().append("g")
         .attr("class", "node")
         .attr("transform", function(d) { 
+            //console.log(d);
+            /*if( d.node < 5){
+                d.y = min_height
+                min_height+= d.dy + 8
+            }*/
             return "translate(" + d.x + "," + d.y + ")"; })
         .call(d3.drag()
         .subject(function(d) {
