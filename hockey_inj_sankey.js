@@ -115,14 +115,14 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
         .attr("class", "node")
         .attr("transform", function(d) { 
             return "translate(" + d.x + "," + d.y + ")"; })
-        .call(d3.drag()
+        /*.call(d3.drag()
         .subject(function(d) {
             return d;
         })
         .on("start", function() {
           this.parentNode.appendChild(this);
         })
-        .on("drag", dragmove));
+        .on("drag", dragmove));*/
 
     // add the rectangles for the nodes
     node.append("rect")
