@@ -9,7 +9,7 @@
 var units = "injuries";
 
 //color scale data
-var colorRange = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15', '#8dd3c7', '#ffffb3', '#bebada', '#80b1d3'];
+var colorRange = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15', '#8dd3c7', '#b3de69', '#bebada', '#80b1d3'];
 
 // set the dimensions and margins of the graph
 var margin = {top: 30, right: 10, bottom: 10, left: 10},
@@ -189,45 +189,61 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
     }
         
     function color_selected_node(d){
-        //just showing that we selected for debugging purposes
+        [...Array(21).keys()].forEach( function(d){
+                d3.select("#node"+d)
+                        .style("fill", "#d9d9d9");
+            })
         var debug_color = "#bc80bd"
         d3.select(this)
-            .style("fill", debug_color);
-        /*console.log(d.node);
-        //console.log(graph.links[0])
-        d3.select("#node0")
-            .style("fill", "green");
-        d3.select("#link0_8")
-            .style("stroke", "green")
-            .style("stroke-opacity", .5);
-        d3.select("#link8_5")
-            .style("stroke", "green")
-            .style("stroke-opacity", .5);*/
+            .style("fill", get_color(d.node));
         
         //coloring connected nodes and links based on what we clicked
         console.log(graph.links[0].value)
         if(d.node>=8){ // body part nodes
+            var unselected_nodes = [...Array(21).keys()]
+            unselected_nodes.splice(d.node,1); //removing self 
             for(var j = 0; j < graph.links.length; j++){
                 if( graph.links[j].source.node==d.node && graph.links[j].value !=0){
                     //right half of the sankey
                     var dest =graph.links[j].target.node
+                    if( dest == 6){
+                       console.log("goalie injuries: "+graph.links[j].value);
+                    }
                     var linkID = "#link"+d.node+"_"+dest
                     d3.select(linkID)
-                        .style("stroke", debug_color)
-                        .style("stroke-opacity", .60);
+                        .style("stroke", get_color(dest))
+                        .style("stroke-opacity", 1);
                     d3.select("#node"+dest)
-                        .style("fill", debug_color);
+                        .style("fill", get_color(dest));
+                    unselected_nodes.splice(unselected_nodes.indexOf(dest), 1)
                 }else if(graph.links[j].target.node==d.node && graph.links[j].value !=0){
                     //left half of the sankey
                     var src =graph.links[j].source.node
                     var linkID = "#link"+src+"_"+d.node
                     d3.select(linkID)
-                        .style("stroke", debug_color)
-                        .style("stroke-opacity", .60);
+                        .style("stroke", get_color(src))
+                        .style("stroke-opacity", 1);
                     d3.select("#node"+src)
-                        .style("fill", debug_color);
+                        .style("fill", get_color(src));
+                    unselected_nodes.splice(unselected_nodes.indexOf(src), 1)
+                }else{
+                    //grey out links
+                    var src =graph.links[j].source.node;
+                    var dest =graph.links[j].target.node;
+                    var linkID = "#link"+src+"_"+dest;
+                    d3.select(linkID)
+                        .style("stroke", "#000")
+                        .style("stroke-opacity", .05);
+                    /*d3.select("#node"+src)
+                        .style("fill", "#d9d9d9");
+                    d3.select("#node"+dest)
+                        .style("fill", "#d9d9d9");*/
+                    
+                    
                 }
             }
+            console.log(unselected_nodes)
+            
         }
     }
     });
