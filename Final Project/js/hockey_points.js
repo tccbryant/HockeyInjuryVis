@@ -56,37 +56,54 @@ function drawToolTipDiv(){
         .append("div")
         .attr('class', 'tool-tip');
 }
+
 function bindOnClickPoints(data){
+    function num_to_percent(num){
+        return (num*100).toFixed(2) + "%";
+    }
     
-    d3.selectAll('.body-point')
-        .on('click', function(){
+    function writeTextToToolTip (body_part, found){
+        var golie_injuries = (found.injuries_g/found.num_injuries),
+            defense_injuries = (found.injuries_d/found.num_injuries),
+            forward_injuries = (found.injuries_f/found.num_injuries);
+
+        d3.select('.injury-type').text(body_part);
+
+        d3.select('.severity').text((found.total_severity / found.num_injuries).toFixed(2));
+
+        d3.select('.inj-list').text(found.notes);
+
+        d3.select(".golie-inj-percentage").text(num_to_percent(golie_injuries));
+
+        d3.select(".defense-inj-percentage").text(num_to_percent(defense_injuries));
+
+        d3.select(".forward-inj-percentage").text(num_to_percent(forward_injuries));
+    }
+    
+    var lastSelection; // create a closure to save the value of the element somewhere
+    d3.selectAll('.body-point').on('click', function(){
             
-            var classes = d3.select(this).attr('class').split(/\s/);
-            var body_part = classes.length > 2 ? classes[1] + " " + classes[2] : classes[1];
+        if(lastSelection !== d3.select(this) && lastSelection !== undefined){
+            lastSelection.attr('fill', 'none');
+        }
+        var currentSelection = d3.select(this),
+            classes = currentSelection.attr('class').split(/\s/),
             
-            var found = data.find(function(element){
+            body_part = classes.length > 2 ? 
+            classes[1] + " " + classes[2] : classes[1],
+            
+            found = data.find(function(element){
                 return body_part === element.injury_type;
             });
-            
-            if(found){
-                var golie_injuries = (found.injuries_g/found.num_injuries)*100,
-                    defense_injuries = (found.injuries_d/found.num_injuries)*100,
-                    forward_injuries = (found.injuries_f/found.num_injuries)*100;
-                
-                d3.select('.injury-type').text(body_part);
-                
-                d3.select('.severity').text((found.total_severity / found.num_injuries).toFixed(2));
-                
-                d3.select('.inj-list').text(found.notes);
-                
-                d3.select(".golie-inj-percentage").text(golie_injuries.toFixed(2));
-                
-                d3.select(".defense-inj-percentage").text(defense_injuries.toFixed(2));
-                
-                d3.select(".forward-inj-percentage").text(forward_injuries.toFixed(2));
-            }
-        })
+
+        if(found) {
+            writeTextToToolTip(body_part, found);   
+        }
+        currentSelection.attr('fill','red');
+        lastSelection = d3.select(this);
+    });
 }
+
 function drawCircles(data){
     svg
         .append('g')
