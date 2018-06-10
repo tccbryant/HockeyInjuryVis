@@ -28,7 +28,7 @@ function getInjuryData(csv){
     }); 
 }
 function mergeCSVandPoints(data){   
-    
+    //merges csv data and the manually set body coords
     data.forEach(function(point){
         var found = body_locations.find(function(element){
             return element.type === point.injury_type;
@@ -48,13 +48,6 @@ function printXY(){
         console.log("left: " + (d3.event.offsetX - 10) + ", top: " + (d3.event.offsetY - 20));
       console.log(d3.event);
     });
-}
-
-function drawToolTipDiv(){
-    d3.select("body")
-        .select(".hockey-player")
-        .append("div")
-        .attr('class', 'tool-tip');
 }
 
 function bindOnClickPoints(data){
@@ -80,7 +73,23 @@ function bindOnClickPoints(data){
         d3.select(".forward-inj-percentage").text(num_to_percent(forward_injuries));
     }
     
-    var lastSelection; // create a closure to save the value of the element somewhere
+    // initialize the first selection on load
+    //****************************************
+    var lastSelection, // create a closure to save the value of the element somewhere
+        firstSelected = 'Leg', // cannot set to Upper or Lower Body
+        selected; 
+        
+    lastSelection = d3.select("." + firstSelected);
+    lastSelection.attr('fill','red');
+    var first_found = data.find(function(element){
+        return firstSelected === element.injury_type;
+    });
+    if(first_found){
+        writeTextToToolTip(firstSelected, first_found);
+        selected = lastSelection;
+    }
+    //****************************************
+    
     d3.selectAll('.body-point').on('click', function(){
             
         if(lastSelection !== d3.select(this) && lastSelection !== undefined){
@@ -97,11 +106,53 @@ function bindOnClickPoints(data){
             });
 
         if(found) {
-            writeTextToToolTip(body_part, found);   
+            writeTextToToolTip(body_part, found);
+            selected = currentSelection;
         }
         currentSelection.attr('fill','red');
         lastSelection = d3.select(this);
     });
+    
+    d3.selectAll('.body-point').on('mouseenter', function(){
+        
+        var currentSelection = d3.select(this),
+            classes = currentSelection.attr('class').split(/\s/),
+            
+            body_part = classes.length > 2 ? 
+            classes[1] + " " + classes[2] : classes[1],
+            
+            found = data.find(function(element){
+                return body_part === element.injury_type;
+            });
+
+        if(found) {
+            writeTextToToolTip(body_part, found);   
+        }
+        currentSelection.attr('fill','red');
+    });
+    
+    d3.selectAll('.body-point').on('mouseleave', function(){
+        if(lastSelection){
+            d3.select(this).attr('fill', 'none');
+            if(selected){
+                selected.attr('fill', 'red');
+            }
+            var classes = lastSelection.attr('class').split(/\s/),
+            
+            body_part = classes.length > 2 ? 
+                classes[1] + " " + classes[2] : classes[1],
+            
+            found = data.find(function(element){
+                return body_part === element.injury_type;
+            });
+
+            if(found) {
+                writeTextToToolTip(body_part, found);   
+            }
+        }
+        
+    });
+    
 }
 
 function drawCircles(data){
@@ -121,11 +172,13 @@ function drawCircles(data){
         .attr('fill', 'none')
     
 }
+
 function drawBodyPoints(){
     var margin = {left: 10, right: 10, bottom: 20, top: 20};
     var width = 320 - (margin.left + margin.right);
     var height = 443 - (margin.top + margin.bottom);
     var img_width = 300, img_height = 423; 
+    
     svg = d3.select('.hockey-player')
         .append("svg")
         .attr("width", width + margin.left + margin.right)
