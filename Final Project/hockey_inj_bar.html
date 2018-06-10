@@ -27,9 +27,39 @@
   </head>
     
   <body>
+      <h1 style = "text-align:center; color:#3030FF"><bold>Hockey Injury Severity</bold></h1>
     <div class="container">
         <div class="row">
-            <div class="hockey-player col-sm-4"></div>
+            <div class="hockey-player col-sm-4">
+            <div class="tool-tip">
+                <table>
+                    <tr>
+                        <td>Injury Type</td>
+                        <td class="injury-type"></td>
+                    </tr>
+                    <tr>
+                        <td>Severity (# games missed)</td>
+                        <td class="severity"></td>
+                    </tr>
+                    <tr>
+                        <td>Includes</td>
+                        <td class="inj-list"></td>
+                    </tr>
+                    <tr>
+                        <td>% Golie Injuries</td>
+                        <td class="golie-inj-percentage"></td>
+                    </tr>
+                    <tr>
+                        <td>% Forward Injuries</td>
+                        <td class="forward-inj-percentage"></td>
+                    </tr>
+                    <tr>
+                        <td>% Defense Injuries</td>
+                        <td class="defense-inj-percentage"></td>
+                    </tr>
+                </table>
+            </div>
+            </div>
             <div class="bar-chart col-sm-8"></div>
         </div>
     </div>
@@ -38,7 +68,7 @@
             <div class="sankey col-sm-12"></div>
         </div>
     </div>
-    <h1 style = "text-align:center; color:#3030FF"><bold>Hockey Injury Bar Graph</bold></h1>
+    
     <!-- Your D3.js code for making a Bar Graph -->
     <script type="text/javascript" src="js/hockey_points.js"></script>
     <script type="text/javascript" src="js/hockey_inj_bar.js"></script> 
