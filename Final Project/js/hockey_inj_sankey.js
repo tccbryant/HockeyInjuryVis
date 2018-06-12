@@ -1,4 +1,133 @@
 var sankey = (function(){
+var node_rects;
+var csv = "data/AggregateInjuries(1).csv";
+var json = "data/sankey.json";
+var units = "injuries";
+
+//color scale data
+var colorRange = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15', '#8dd3c7', '#b3de69', '#bebada', '#80b1d3'];
+
+// set the dimensions and margins of the graph
+var margin = {top: 30, right: 10, bottom: 10, left: 10},
+    width = 1200 -50 - margin.left - margin.right,
+    height = 500 -25- margin.top - margin.bottom;
+
+// format variables
+var formatNumber = d3.format(",.0f"),    // zero decimal places
+    format = function(d) { return formatNumber(d) + " " + units; },
+    color = d3.scaleOrdinal(d3.schemeCategory20);
+    
+// append the svg object to the body of the page
+var svg = d3.select(".sankey").append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", 
+          "translate(" + margin.left + "," + margin.top + ")");
+
+var node_width = 75;
+// Set the sankey diagram properties
+var sankey = d3.sankey()
+    .nodeWidth(node_width)
+    .size([width, height]);
+
+var path = sankey.link();
+
+var translation = ["8","9","12","13","15", //based on sev_scale
+                   "F","G","D",
+                   "Lower body", "Upper body","Leg", "Head", "Foot", "Hand", "Groin", "Shoulder", "Back", "Face", "Torso", "Arm", "Neck"]
+    
+function getInjuryCSV(csv){
+    return new Promise(function(resolve, reject){
+        d3.csv(csv, function(error,data){
+            if(error){
+                reject(error);
+            } 
+            data.forEach(function(d,i) {
+                d.injuries_d=+d.injuries_d;
+                d.injuries_f=+d.injuries_f;
+                d.injuries_g=+d.injuries_g;
+                d.type = d.injury_type;
+                d.number = +d.num_injuries;
+                d.severity = +d.total_severity / +d.num_injuries;
+            });
+            resolve(data);
+        });
+    });
+}
+function getSankeyJSON(json){
+    return new Promise(function(resolve,reject){
+        d3.json(json, function(error, data){
+            if(error){
+                reject(error);
+            }
+            
+            resolve(data); 
+        });
+    });
+}
+function formatData(data,graph){
+    for (var i = 0; i < data.length; i++) {
+        var type = data[i].type;
+        var node_num = translation.indexOf(type);
+        //console.log(type, node_num);
+        var sev_node_num = sev_scale(data[i].severity);
+        var num_injuries = data[i].number;
+        var num_f = data[i].injuries_f;
+        var num_g = data[i].injuries_g;
+        var num_d = data[i].injuries_d;
+
+        for(var j = 0; j < graph.links.length; j++){
+            if( graph.links[j].source==node_num){
+                if( graph.links[j].target==5){
+                    graph.links[j].value=num_f;
+                }else if( graph.links[j].target==6){
+                    graph.links[j].value=num_g;
+                }else if( graph.links[j].target==7){
+                    graph.links[j].value=num_d;
+                }
+            }else if(graph.links[j].target==node_num){
+                if( graph.links[j].source==sev_node_num){
+                    graph.links[j].value = num_injuries;
+                }
+            }
+        }
+    }
+    
+    return graph; 
+}
+function init_2(){
+    Promise.all([getInjuryCSV(csv), getSankeyJSON(json)]).then(function(all_data){
+        var data = all_data[0],
+            graph = all_data[1];
+        graph = formatData(data,graph);
+        
+        sankey
+            .nodes(graph.nodes)
+            .links(graph.links)
+            .layout(0);
+        
+        sankey
+            .nodes(graph.nodes)
+            .links(graph.links)
+            .layout(0);
+
+        // add in the links
+        var link = 
+            svg.append("g").selectAll(".link")
+            .data(graph.links)
+            .enter()
+            .append("path")
+            .attr("class", "link")
+            .attr("d", path)
+            .attr("id", function(d) {
+                return "link"+ d.source.node+"_"+d.target.node;
+            })
+            .style("stroke-width", 
+                function(d) { return Math.max(0, d.dy); });
+        
+    })
+}
 function init(){
     //source: 
     //-https://bl.ocks.org/d3noob/013054e8d7807dff76247b81b0e29030
@@ -6,42 +135,9 @@ function init(){
     //  -node color
     //  -ribbon color
     //  -do something when a node is clicked
-
-
-    var units = "injuries";
-
-    //color scale data
-    var colorRange = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15', '#8dd3c7', '#b3de69', '#bebada', '#80b1d3'];
-
-    // set the dimensions and margins of the graph
-    var margin = {top: 30, right: 10, bottom: 10, left: 10},
-        width = 1200 -50 - margin.left - margin.right,
-        height = 500 -25- margin.top - margin.bottom;
-
-    // format variables
-    var formatNumber = d3.format(",.0f"),    // zero decimal places
-        format = function(d) { return formatNumber(d) + " " + units; },
-        color = d3.scaleOrdinal(d3.schemeCategory20);
-
-    // append the svg object to the body of the page
-    var svg = d3.select(".sankey").append("svg")
-        .attr("width", width + margin.left + margin.right)
-        .attr("height", height + margin.top + margin.bottom)
-      .append("g")
-        .attr("transform", 
-              "translate(" + margin.left + "," + margin.top + ")");
-
-    var node_width = 75;
-    // Set the sankey diagram properties
-    var sankey = d3.sankey()
-        .nodeWidth(node_width)
-        .size([width, height]);
-
-    var path = sankey.link();
-
-    var translation = ["8","9","12","13","15", //based on sev_scale
-                       "F","G","D",
-                       "Lower body", "Upper body","Leg", "Head", "Foot", "Hand", "Groin", "Shoulder", "Back", "Face", "Torso", "Arm", "Neck"]
+    
+    //all the same variables are still availbe to you, they're
+    // just global to the module now. 
     //load csv data
     d3.csv("data/AggregateInjuries(1).csv", function(error, data) {
 
@@ -53,7 +149,7 @@ function init(){
             d.number = +d.num_injuries;
             d.severity = +d.total_severity / +d.num_injuries;
         });
-        console.log( data[0]);
+        
         // load the json data
         d3.json("data/sankey.json", function(error, graph) {
             /*graph.nodes.forEach(function(d,i){
@@ -105,7 +201,7 @@ function init(){
                 return "link"+ d.source.node+"_"+d.target.node;
             })
             .style("stroke-width", function(d) { return Math.max(0, d.dy); });
-            //.sort(function(a, b) { return b.dy - a.dy; });
+            
 
         // add the link titles
         link.append("title")
@@ -251,19 +347,7 @@ function init(){
         });
     });
 
-    function sev_scale(num){
-        if( num < 8){
-            return 0;
-        }else if( num < 9){
-            return 1;
-        }else if( num < 12){
-            return 2;
-        }else if( num < 13){
-            return 3;
-        }else{
-            return 4
-        }
-    }
+    
 
     function get_color(num){
         if( num <= 8){ //for severity and position colors
@@ -271,6 +355,19 @@ function init(){
         }else{ //for body part colors
             return "#80b1d3"
         }
+    }
+}
+function sev_scale(num){
+    if( num < 8){
+        return 0;
+    }else if( num < 9){
+        return 1;
+    }else if( num < 12){
+        return 2;
+    }else if( num < 13){
+        return 3;
+    }else{
+        return 4
     }
 }
 return {

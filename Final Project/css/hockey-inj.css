@@ -4,7 +4,7 @@
     left: -50px;
     background: rgb(205, 208, 214);
     width: 180px;
-    height:300px;
+    height:auto;
 }
 .tool-tip table {
     word-wrap: break-word;
@@ -14,10 +14,12 @@
 }
 .tool-tip tr td:first-child{
     text-align: left;
+    padding:2px;
     width: 80px;
 }
 .tool-tip tr td:last-child{
     text-align: right;
+    padding:2px;
     width:100px;
 }
 .tool-tip td {
