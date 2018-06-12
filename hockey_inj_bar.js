@@ -32,11 +32,19 @@ var yAxis = d3.axisLeft(yScale); //.ticks .tickformat
 
 
 d3.csv("AggregateInjuries(1).csv", function(error, data) {
+    
+    var keys = ["injuries_g", "injuries_d", "injuries_f"];
+    
     data.forEach(function(d) {
         d.type = d.injury_type;
         d.number = +d.num_injuries;
         d.severity = +d.total_severity / +d.num_injuries;
+        d.forward = +d.injuries_f;
+        d.defence = +d.injuries_d;
+        d.goalie = +d.injuries_g;
     });
+    
+    console.log(data.columns.slice(1))
     
     //block for color scale domain
     cMax = d3.max(data, function(d) { return d.severity; });
@@ -46,13 +54,28 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
     
     colorDomain = [8, 9, 12, 13, 15];
     
-    console.log(colorDomain);
-    
     //update the domains of the scales with the data
     xScale.domain(data.map(function(d) { return d.type; }));
-    yScale.domain([0, d3.max(data, function(d) { return d.number; })]);
+    yScale.domain([0, d3.max(data, function(d) { return d.number; })]).nice;
     cScale.domain(colorDomain);
     
+    console.log(d3.stack().keys(keys)(data))
+    
+    svg.append("g")
+        .selectAll("g")
+        .data(d3.stack().keys(keys)(data))
+        .enter().append("g")
+        .selectAll("rect")
+        .data(function(d) { return d; })
+        .enter().append("rect")
+            .attr("fill", function(d) { return cScale(d.data.severity); })
+            .attr("stroke", "#000000")
+            .attr("x", function(d) { return xScale(d.data.type); })
+            .attr("y", function(d) { return yScale(d[1])})
+            .attr("height", function(d) { return yScale(d[0]) - yScale(d[1]); })
+            .attr("width", xScale.bandwidth());
+    
+    /*
     //draw the bars
     var bars = svg.selectAll("rect")
         .data(data)
@@ -76,6 +99,7 @@ d3.csv("AggregateInjuries(1).csv", function(error, data) {
         .attr("fill", function(d) {
             return(cScale(d.severity))
         });
+    */
     
     svg.append("g")
         .attr("class", "x axis")
