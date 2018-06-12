@@ -26,10 +26,15 @@ function init(){
     var xScale = d3.scaleBand().rangeRound([0, width]).padding(0.1);
     var yScale = d3.scaleLinear().range([height, 0]);
     var cScale = d3.scaleThreshold().range(colorRange);
+    var lScale = d3.scaleLinear().domain([5, 15]).range([0, 240]);
 
     //create the x and y axes
     var xAxis = d3.axisBottom(xScale);
     var yAxis = d3.axisLeft(yScale); //.ticks .tickformat
+    var lAxis = d3.axisBottom(lScale)
+        .tickSize(13)
+        .tickValues(cScale.domain())
+        .tickFormat(function(d) { return d3.format(".0f")(d); });
 
 
 
@@ -48,12 +53,13 @@ function init(){
 
         colorDomain = [8, 9, 12, 13, 15];
 
-        console.log(colorDomain);
+        console.log(cMax + ", " + cMin);
 
         //update the domains of the scales with the data
         xScale.domain(data.map(function(d) { return d.type; }));
-        yScale.domain([0, d3.max(data, function(d) { return d.number; })]);
+        yScale.domain([0, 1.05*d3.max(data, function(d) { return d.number; })]);
         cScale.domain(colorDomain);
+        lAxis.tickValues(cScale.domain());
 
         //draw the bars
         var bars = svg.selectAll("rect")
@@ -103,6 +109,26 @@ function init(){
             .style("font-family", "sans-serif")
             .text("Number of Injuries");
 
+        var g = d3.select("g").call(lAxis);
+        
+        g.select(".domain")
+            .remove();
+        
+        g.selectAll("rect")
+            .data(cScale.range().map(function(color) {
+                var d = cScale.invertExtent(color);
+                if(d[0]==null) d[0]=lScale.domain()[0];
+                if(d[1]==null) d[1]=lScale.domain()[1];
+                console.log(d);
+                return d;
+            }))
+            .enter().insert("rect", ".tick")
+                .attr("height", 8)
+                .attr("x", function(d) { return lScale(d[0]); })
+                .attr("width", function(d) { return lScale(d[1]) - lScale(d[0]); })
+                .attr("fill", function(d) { return cScale(d[0]); });
+        
+        
         var ls_w = 40, ls_h = 20;
 
         var legend = svg.selectAll("g.legend")
@@ -132,6 +158,7 @@ function init(){
             .style("font-family", "sans-serif")
             .style("font-size", "11pt")
             .text("Injury Severity (Games Missed)")
+            
     });
 }
     return {
