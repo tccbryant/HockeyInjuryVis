@@ -287,17 +287,18 @@ function init(){
         }
 
         function color_selected_node(d){
-            [...Array(21).keys()].forEach( function(d){
-                    d3.select("#node"+d)
-                            .style("fill", "#d9d9d9");
-                })
-            var debug_color = "#bc80bd"
-            d3.select(this)
-                .style("fill", get_color(d.node));
-
             //coloring connected nodes and links based on what we clicked
             console.log(graph.links[0].value)
             if(d.node>=8){ // body part nodes
+                [...Array(21).keys()].forEach( function(d){ //remove color from all nodes
+                        d3.select("#node"+d)
+                                .style("fill", "#d9d9d9");
+                    })
+                var debug_color = "#bc80bd"
+                d3.select(this)
+                    .style("fill", get_color(d.node));
+                
+                
                 var unselected_nodes = [...Array(21).keys()]
                 unselected_nodes.splice(d.node,1); //removing self 
                 for(var j = 0; j < graph.links.length; j++){
