@@ -9,7 +9,7 @@ function init(){
     //define the margins
     var margin = {top: 10, right: 40, bottom: 150, left: 70},
         width = 760 - margin.left - margin.right,
-        height = 500 - margin.top - margin.bottom;
+        height = 510 - margin.top - margin.bottom;
 
     //define the svg
     var svg = d3.select(".bar-chart").append("svg") //will need to change body to something else
@@ -84,6 +84,16 @@ function init(){
             .attr("fill", function(d) {
                 return(cScale(d.severity))
             });
+        
+        svg.selectAll("text")
+            .data(data)
+            .enter().append("text")
+            .attr("text-anchor", "middle")
+            .attr("x", function(d) { return xScale(d.type) + 20; })
+            .attr("y", function(d) { return yScale(d.number) - 5; })
+            .style("font-size", "10px")
+            .text(function(d) { return d.number; });
+        
 
         svg.append("g")
             .attr("class", "x axis")
@@ -128,36 +138,12 @@ function init(){
                 .attr("width", function(d) { return lScale(d[1]) - lScale(d[0]); })
                 .attr("fill", function(d) { return cScale(d[0]); });
         
-        
-        var ls_w = 40, ls_h = 20;
-
-        var legend = svg.selectAll("g.legend")
-            .data(colorDomain)
-            .enter().append("g")
-            .attr("class", "legend");
-
-        legend.append("rect")
-            .attr("x", function(d,i) { return width - (i*ls_w) - 50; })
-            .attr("y", function(d, i){ return 80 - (ls_h) - 2*ls_h; })
-            .attr("width", ls_w)
-            .attr("height", ls_h)
-            .style("fill", function(d, i) {
-                return cScale(d-1); 
-            })
-            .attr("stroke", "#000000");
-
-        legend.append("text")
-            .attr("x", function(d, i){ return width - (i*ls_w) - 35; })
-            .attr("y", function(d, i){ return 80 - (ls_h) - ls_h + 15; })
-            .style("text-align", "middle")
-            .text(function(d, i){ return colorDomain[i]; });
-
-        svg.append("text")
-            .attr("x", width - 212)
-            .attr("y", 10)
-            .style("font-family", "sans-serif")
-            .style("font-size", "11pt")
-            .text("Injury Severity (Games Missed)")
+        g.append("text")
+            .attr("fill", "#000")
+            .attr("font-weight", "bold")
+            .attr("text-anchor", "start")
+            .attr("y", -6)
+            .text("Injury Severity (Number of Games Missed)");
             
     });
 }
