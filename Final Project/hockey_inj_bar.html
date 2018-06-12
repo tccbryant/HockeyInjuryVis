@@ -19,18 +19,61 @@
     <!-- Meta Tag -->
     <meta charset="utf-8">
     <!-- CSS Stylesheet -->
-    <link rel="stylesheet" type="text/css" href="css/hockey-inj.css">  
+    <link rel="stylesheet" type="text/css" href="css/hockey-inj.css">
+    <link rel="stylesheet" type="text/css" href="css/hockey_inj_sankey.css"> 
     <!-- D3.js Source -->
     <script type= "text/javascript" src="https://d3js.org/d3.v4.min.js"></script> 
+    <script type='text/javascript' src='https://cdnjs.cloudflare.com/ajax/libs/d3-annotation/2.2.5/d3-annotation.js'></script>
   </head>
     
   <body>
-    <div class="hockey-player col-sm-4"><img class="hockey-img" src="img/hockey-icon.png"/></div>
-    <div class="bar-chart col-sm-8"></div>
-    <h1 style = "text-align:center; color:#3030FF"><bold>Hockey Injury Bar Graph</bold></h1>
+      <h1 style = "text-align:center; color:#3030FF"><bold>Hockey Injury Severity</bold></h1>
+    <div class="container">
+        <div class="row">
+            <div class="hockey-player col-sm-4">
+            <div class="tool-tip">
+                <table>
+                    <tr>
+                        <td>Injury Type</td>
+                        <td class="injury-type"></td>
+                    </tr>
+                    <tr>
+                        <td>Severity (# games missed)</td>
+                        <td class="severity"></td>
+                    </tr>
+                    <tr>
+                        <td>Included Injuries</td>
+                        <td class="inj-list"></td>
+                    </tr>
+                    <tr>
+                        <td>% Golie Injuries</td>
+                        <td class="golie-inj-percentage"></td>
+                    </tr>
+                    <tr>
+                        <td>% Forward Injuries</td>
+                        <td class="forward-inj-percentage"></td>
+                    </tr>
+                    <tr>
+                        <td>% Defense Injuries</td>
+                        <td class="defense-inj-percentage"></td>
+                    </tr>
+                </table>
+            </div>
+            </div>
+            <div class="bar-chart col-sm-8"></div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="sankey col-sm-12"></div>
+        </div>
+    </div>
+    
     <!-- Your D3.js code for making a Bar Graph -->
     <script type="text/javascript" src="js/hockey_points.js"></script>
     <script type="text/javascript" src="js/hockey_inj_bar.js"></script> 
+    <script type= "text/javascript" src="js/sankey.js"></script>
+    <script type="text/javascript" src="js/hockey_inj_sankey.js"></script> 
       <!-- ADD YOUR NAME. REQUIRED -->
   </body>
     Thomas Bryant
