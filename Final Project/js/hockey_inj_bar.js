@@ -76,18 +76,18 @@ function init(){
                 return xScale(d.type);
             })
             .on("click", function(d, i) {
-                var index = i;
+                var dat = d;
                 var greyBars = bars.filter(function(d, i) {
-                    return i != index;
+                    return dat.type != d.type;
                 })
                 var colorBar = bars.filter(function(d, i) {
-                    return i == index;
+                    return dat.type == d.type;
                 })
                 var unselectedText = labels.filter(function(d, i) {
-                    return i != index;
+                    return dat.type != d.type;
                 })
                 var selectedText = labels.filter(function(d, i) {
-                    return i == index;
+                    return dat.type == d.type;
                 })
                 console.log(unselectedText);
                 unselectedText.style("color", "#ffffff");
