@@ -21,6 +21,8 @@ function init(){
     //color scale data
     var colorRange = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15'];
     var colorDomain = [];
+    
+    var selection = [];
 
     //scales
     var xScale = d3.scaleBand().rangeRound([0, width]).padding(0.1);
@@ -43,6 +45,7 @@ function init(){
             d.type = d.injury_type;
             d.number = +d.num_injuries;
             d.severity = +d.total_severity / +d.num_injuries;
+            d.selected = false;
         });
 
         //block for color scale domain
@@ -51,7 +54,7 @@ function init(){
 
         d = (cMax - cMin)/5;
 
-        colorDomain = [8, 9, 12, 13, 15];
+        colorDomain = [7, 10, 12, 13, 15];
 
         console.log(cMax + ", " + cMin);
 
@@ -72,26 +75,46 @@ function init(){
             .attr("x", function(d) {
                 return xScale(d.type);
             })
-            .transition().ease(d3.easeCubic).duration(1200)
-            .delay(function(d,i) { return i*100; })
+            .on("click", function(d, i) {
+                var index = i;
+                var greyBars = bars.filter(function(d, i) {
+                    return i != index;
+                })
+                var colorBar = bars.filter(function(d, i) {
+                    return i == index;
+                })
+                var unselectedText = labels.filter(function(d, i) {
+                    return i != index;
+                })
+                var selectedText = labels.filter(function(d, i) {
+                    return i == index;
+                })
+                console.log(unselectedText);
+                unselectedText.style("color", "#ffffff");
+                colorBar.style("fill", function(d) {
+                        return(cScale(d.severity))
+                    })
+                greyBars
+                    .style("fill", "#d3d3d3");
+            })
             .attr("y", function(d) {
                 return yScale(d.number);
             })
             .attr("height", function(d) {
                 return height - yScale(d.number);
             })
-            .attr("stroke", "#000000")
             .attr("fill", function(d) {
-                return(cScale(d.severity))
+                return(cScale(d.severity));
             });
         
-        svg.selectAll("text")
+        var labels = svg.selectAll("text")
             .data(data)
             .enter().append("text")
             .attr("text-anchor", "middle")
             .attr("x", function(d) { return xScale(d.type) + 20; })
             .attr("y", function(d) { return yScale(d.number) - 5; })
             .style("font-size", "10px")
+            .style("color", "#000000")
             .text(function(d) { return d.number; });
         
 
