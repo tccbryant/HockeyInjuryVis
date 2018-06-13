@@ -119,7 +119,10 @@ function init(){
             .style("font-family", "sans-serif")
             .text("Number of Injuries");
 
-        var g = d3.select("g").call(lAxis);
+        
+        var g = svg.append("g")
+            .attr("transform", "translate(400, 20)")
+            .call(lAxis);
         
         g.select(".domain")
             .remove();
@@ -129,7 +132,6 @@ function init(){
                 var d = cScale.invertExtent(color);
                 if(d[0]==null) d[0]=lScale.domain()[0];
                 if(d[1]==null) d[1]=lScale.domain()[1];
-                console.log(d);
                 return d;
             }))
             .enter().insert("rect", ".tick")
@@ -142,7 +144,7 @@ function init(){
             .attr("fill", "#000")
             .attr("font-weight", "bold")
             .attr("text-anchor", "start")
-            .attr("y", -6)
+            .attr("y", -5)
             .text("Injury Severity (Number of Games Missed)");
             
     });
