@@ -7,6 +7,8 @@ var units = "injuries";
 var isSelected = false;
 var lastSelectedNode = -1;
 var highlightedNodes = [...Array(21).keys()]; 
+var yOffset = 175; //500:275
+var xOffset = 150; //500:150
 
 //color scale data
 var colorRange = ['#a50f15', '#de2d26', '#fb6a4a', '#fcae91', '#fee5d9', '#8dd3c7', '#b3de69', '#bebada', '#80b1d3'];
@@ -14,11 +16,11 @@ var colorRange = ['#a50f15', '#de2d26', '#fb6a4a', '#fcae91', '#fee5d9', '#8dd3c
 // set the dimensions and margins of the graph
 var margin = {top: 30, right: 10, bottom: 10, left: 10},
     width = 1200 -50 - margin.left - margin.right,
-    height = 500 -25- margin.top - margin.bottom;
+    height = 600 -25- margin.top - margin.bottom;
 
 // format variables
 var formatNumber = d3.format(",.0f"),    // zero decimal places
-    format = function(d) { return formatNumber(d) + " " + units; },
+    format = function(d) { return formatNumber(d); },
     color = d3.scaleOrdinal(d3.schemeCategory20);
     
 // append the svg object to the body of the page
@@ -234,18 +236,18 @@ function init(){
                         .duration(200)
                         .style("opacity", .95);
 
-                    var mouseover_div = div.html( "<b>"+ format(d.value)+"</b>");
+                    var mouseover_div = div.html( "<b>"+ format(d.value)+" injuries</b>");
                     
                 
                     console.log( target_node_num, source_node_num, "  are in ", highlightedNodes);
                     if( translation.indexOf(d.source.name) <5){
                         //console.log("<<<<<<<<<<<<[[",translation.indexOf(d.source.name),"]]")
-                        mouseover_div.style("top", d.source.y/*(d3.event.pageY)*/ + "px")
-                                     .style("left", d.source.x/*(d3.event.pageX)*/ + "px");
+                        mouseover_div.style("top", (d3.event.clientY-yOffset) + "px")
+                                     .style("left", (d3.event.clientX-xOffset) + "px");
                     }else{
                         //console.log(">>>>>>>>>>>>[[",translation.indexOf(d.source.name),"]]")
-                        mouseover_div.style("top", d.target.y/*(d3.event.pageY)*/ + "px")
-                                     .style("left", d.target.x/*(d3.event.pageX)*/ + "px");
+                        mouseover_div.style("top", (d3.event.clientY-yOffset) + "px")
+                                     .style("left", (d3.event.clientX-xOffset) + "px");
                     }
                 }//////////////////////////
                                         
@@ -290,20 +292,23 @@ function init(){
                     .duration(200)
                     .style("opacity", .95);
             
-                var mouseover_div = div.style("left", d.x/*(d3.event.pageX)*/ + "px")
-                                        .style("top", d.y/*(d3.event.pageY)*/ + "px");
+                var mouseover_div = div.style("left", (d3.event.clientX-xOffset) + "px")
+                                        .style("top", (d3.event.clientY-yOffset) + "px");
                 if( translation.indexOf(d.name) <5){
                     console.log(d.name, " is a severity", translation.indexOf(d.name));
-                    mouseover_div.html( "<b><center>Severity: "+d.name+"</center>"+
-                         "</br>"+ format(d.value)+"</b>")
+                    mouseover_div.html( "<b>Total injuries of this severity level: "+format(d.value))
+                        //"<b><p>Severity: "+d.name+"</p>"+
+                         //format(d.value)+"</b>")
                 }else if( translation.indexOf(d.name) <8){
                     console.log(d.name, " is a position")
-                    mouseover_div.html( "<b><center>Position: "+d.name+"</center>"+
-                         "</br>"+ format(d.value)+"</b>")
+                    mouseover_div.html( "<b>Total "+d.name+" injuries: "+ format(d.value))
+                        //"<b>Position: "+d.name+""+
+                         //"</br>"+ format(d.value)+"</b>")
                 }else{
                     console.log(d.name, " is a body part")
-                    mouseover_div.html( "<b><center>Body Part: "+d.name+"</center>"+
-                         "</br>"+ format(d.value)+"</b>")
+                    mouseover_div.html( "<b>Total "+d.name+" injuries: "+ format(d.value))
+                        //"<b><center>Body Part: "+d.name+"</center>"+
+                         //"</br>"+ format(d.value)+"</b>")
                 }
                 
                     
