@@ -89,10 +89,10 @@ function init(){
                 var selectedText = labels.filter(function(d, i) {
                     return dat.type == d.type;
                 })
-                console.log(unselectedText);
-                unselectedText.style("color", "#ffffff");
+                unselectedText.style("fill", "#ffffff");
+                selectedText.style("fill", "#000000");
                 colorBar.style("fill", function(d) {
-                        return(cScale(d.severity))
+                        return(cScale(d.severity));
                     })
                 greyBars
                     .style("fill", "#d3d3d3");
@@ -114,7 +114,6 @@ function init(){
             .attr("x", function(d) { return xScale(d.type) + 20; })
             .attr("y", function(d) { return yScale(d.number) - 5; })
             .style("font-size", "10px")
-            .style("color", "#000000")
             .text(function(d) { return d.number; });
         
 
