@@ -31,3 +31,6 @@
 .button:hover{
     cursor:pointer;
 }
+table td{
+    font-size: 12px;
+}
