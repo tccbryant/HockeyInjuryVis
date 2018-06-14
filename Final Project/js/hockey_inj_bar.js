@@ -61,6 +61,13 @@ function init(dispatcher){
         yScale.domain([0, 1.05*d3.max(data, function(d) { return d.number; })]);
         cScale.domain(colorDomain);
         lAxis.tickValues(cScale.domain());
+        
+        var reset_colors = function() {
+            bars.style("fill", function(d) {
+                return cScale(d.severity);
+            })
+            labels.style("fill", "#000000");
+        }
 
         //draw the bars
         var bars = svg.selectAll("rect")
