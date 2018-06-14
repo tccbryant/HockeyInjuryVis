@@ -147,6 +147,8 @@ function init(){
     //all the same variables are still availbe to you, they're
     // just global to the module now. 
     //load csv data
+    
+    
     d3.csv("data/AggregateInjuries(1).csv", function(error, data) {
 
         data.forEach(function(d,i) {
