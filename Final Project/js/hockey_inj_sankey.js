@@ -306,15 +306,20 @@ function init(dispatcher){
             //.on("click", color_selected_node)
             
         dispatcher.on('click',function(body_part){
-            var find = {};
-            var filtered = node_rects.filter(function(d){
-                if(d.name === body_part){
-                    find['node'] = d.node;
-                }
-                return d.name === body_part;
-            });
+            if(body_part !== 'all'){
+                var find = {};
+                var filtered = node_rects.filter(function(d){
+                    if(d.name === body_part){
+                        find['node'] = d.node;
+                    }
+                    return d.name === body_part;
+                });
+
+                color_selected_node(find, filtered);
+            } else {
+                colorAllNodes();
+            }
             
-            color_selected_node(find, filtered);
         })
 
         // add in the title for the nodes

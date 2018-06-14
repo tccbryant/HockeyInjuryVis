@@ -18,6 +18,28 @@ var body_locations = [
     {type: 'Arm', left: 149, top: 142}
 ];
 
+function drawSelectAll(){
+    var square = 
+        svg.append("g")
+            .attr('class', 'button')
+            .style("pointer-events","visible");
+    
+    square.append('rect')
+        .attr('width', 80)
+        .attr('height', 30)
+        .attr('fill', 'none')
+        .attr("stroke",'black')
+        .attr('stroke-width', 2);
+    
+    square.append("text")
+        .text("select all")
+        .attr('y', 20)
+        .attr('x', 10);
+        
+    
+}
+
+
 function getInjuryData(csv){
     return new Promise(function(resolve,reject){
         d3.csv(csv, function(error, data){
@@ -77,19 +99,27 @@ function bindOnClickPoints(data){
     // initialize the first selection on load
     //****************************************
     var lastSelection, // create a closure to save the value of the element somewhere
-        firstSelected = 'Leg', // cannot set to Upper or Lower Body
-        selected;
-    lastSelection = d3.select("." + firstSelected);
-    lastSelection.attr('fill','#ad1313');
-    var first_found = data.find(function(element){
-        return firstSelected === element.injury_type;
-    });
-    if(first_found){
-        writeTextToToolTip(firstSelected, first_found);
-        selected = lastSelection;
-    }
-    //****************************************
+        firstSelected = 'all', // cannot set to Upper or Lower Body
+        selected,
+        button = d3.select('.button'),
+        button_selected = false;
     
+//    lastSelection = d3.select("." + firstSelected);
+//    lastSelection.attr('fill','#ad1313');
+//    var first_found = data.find(function(element){
+//        return firstSelected === element.injury_type;
+//    });
+//    if(first_found){
+//        writeTextToToolTip(firstSelected, first_found);
+//        selected = lastSelection;
+//    }
+    //****************************************
+        
+    //set up initial state
+    button.select('rect').attr('fill', 'red');
+    button_selected = true;
+    showHideToolTip(true);
+
     d3.selectAll('.body-point').on('click', function(){
             
         if(lastSelection !== d3.select(this) && lastSelection !== undefined){
@@ -108,6 +138,10 @@ function bindOnClickPoints(data){
         if(found) {
             writeTextToToolTip(body_part, found);
             selected = currentSelection;
+            showHideToolTip(false);
+            d3.select('.button').select('rect')
+                .attr('fill', 'none');
+            button_selected = false;
             dispatcher.call('click', this, body_part);
         }
         currentSelection.attr('fill','#ad1313');
@@ -115,7 +149,6 @@ function bindOnClickPoints(data){
     });
     
     d3.selectAll('.body-point').on('mouseenter', function(){
-        
         var currentSelection = d3.select(this),
             classes = currentSelection.attr('class').split(/\s/),
             
@@ -127,17 +160,20 @@ function bindOnClickPoints(data){
             });
 
         if(found) {
-            writeTextToToolTip(body_part, found);   
+            writeTextToToolTip(body_part, found); 
+            showHideToolTip(false);
         }
         currentSelection.attr('fill','#ff7f7f');
     });
     
     d3.selectAll('.body-point').on('mouseleave', function(){
+        
+        d3.select(this).attr('fill', 'none');
+
+        if(selected){
+            selected.attr('fill', '#ad1313');
+        }
         if(lastSelection){
-            d3.select(this).attr('fill', 'none');
-            if(selected){
-                selected.attr('fill', '#ad1313');
-            }
             var classes = lastSelection.attr('class').split(/\s/),
             
             body_part = classes.length > 2 ? 
@@ -148,14 +184,53 @@ function bindOnClickPoints(data){
             });
 
             if(found) {
-                writeTextToToolTip(body_part, found);   
+                writeTextToToolTip(body_part, found);
             }
+        }
+        if(button_selected){
+            showHideToolTip(true);
         }
         
     });
     
+   
+    
+
+    button.on('click', function(){
+        var square = d3.select(this).select('rect');
+        if(!button_selected){
+            square
+                .attr('fill', 'red');
+
+            d3.select('.body-points-group')
+                .selectAll('.body-point')
+                .attr('fill','none');
+            showHideToolTip(true);
+            lastSelection = undefined;
+            firstSelected = 'all';
+            selected = undefined;
+            button_selected = true;
+        } 
+//        else {
+//           square
+//            .attr('fill', 'none');
+//            showHideToolTip(false);
+//        }
+//        button_selected = !button_selected; 
+        dispatcher.call('click', this, 'all');
+    });
+    
 }
 
+function showHideToolTip(hide){
+    var tooltip = d3.select('.tool-tip');
+    if(hide){
+        tooltip
+            .style('display', 'none');
+    } else {
+        tooltip.style('display', 'block');
+    }
+}
 function drawCircles(data){
     svg
         .append('g')
@@ -198,9 +273,11 @@ function drawBodyPoints(){
     
     getInjuryData(csv).then(mergeCSVandPoints).then(function(data){
         drawCircles(data);
+        drawSelectAll();
         bindOnClickPoints(data);
         bar_chart.init(dispatcher);
         sankey.init(dispatcher);
+        
     })
     
      
