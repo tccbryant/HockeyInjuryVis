@@ -131,6 +131,7 @@ function init(dispatcher){
             d.severity = +d.total_severity / +d.num_injuries;
         });
         
+        console.log(data);
         // load the json data
         d3.json("data/sankey.json", function(error, graph) {
             /*graph.nodes.forEach(function(d,i){
@@ -205,18 +206,25 @@ function init(dispatcher){
                         .duration(200)
                         .style("opacity", .95);
 
-                    var mouseover_div = div.html( "<b>"+ format(d.value)+" injuries</b>");
+                    var mouseover_div = div;
                     
                 
                     //console.log( target_node_num, source_node_num, "  are in ", highlightedNodes);
                     console.log(d3.mouse(this));
                     if( translation.indexOf(d.source.name) <5){
                         //console.log("<<<<<<<<<<<<[[",translation.indexOf(d.source.name),"]]")
-                        mouseover_div.style("top", (d3.mouse(this)[1]) + "px")
+                        var current_severity = 0;
+                        console.log(d)
+                        data.forEach(function(x){ if(d.target.name == x.type){current_severity=x.severity;console.log(x.severity);}})
+                        mouseover_div.html( "<b>"+ format(d.value)+" "+ d.target.name +" injuries<br>"+
+                                            "Average number of games missed: "+current_severity.toFixed(2)+"</b>")
+                                     .style("top", (d3.mouse(this)[1]) + "px")
                                      .style("left", (d3.mouse(this)[0]) + "px");
                     }else{
                         //console.log(">>>>>>>>>>>>[[",translation.indexOf(d.source.name),"]]")
-                        mouseover_div.style("top", (d3.mouse(this)[1]) + "px")
+                        mouseover_div.html( "<b>"+ format(d.value)+" "+ d.source.name +" injuries</b>"
+                                          )
+                                     .style("top", (d3.mouse(this)[1]) + "px")
                                      .style("left", (d3.mouse(this)[0]) + "px");
                     }
                 }//////////////////////////
