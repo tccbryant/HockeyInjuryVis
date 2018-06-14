@@ -15,7 +15,6 @@ function init(dispatcher){
         .attr("height", height + margin.top + margin.bottom)
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-    console.log(svg);
     //color scale data
     var colorRange = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15'];
     var colorDomain = [];
@@ -54,8 +53,6 @@ function init(dispatcher){
 
         colorDomain = [7, 10, 12, 13, 15];
 
-        console.log(cMax + ", " + cMin);
-
         //update the domains of the scales with the data
         xScale.domain(data.map(function(d) { return d.type; }));
         yScale.domain([0, 1.05*d3.max(data, function(d) { return d.number; })]);
@@ -68,6 +65,7 @@ function init(dispatcher){
             })
             labels.style("fill", "#000000");
         }
+        
 
         //draw the bars
         var bars = svg.selectAll("rect")
@@ -115,26 +113,30 @@ function init(dispatcher){
             });
        
        dispatcher.on('click.player', function(first){
-                
-            var greyBars = bars.filter(function(d, i) {
-                return first != d.type;
-            })
-            var colorBar = bars.filter(function(d, i) {
-                return first == d.type;
-            })
-            var unselectedText = labels.filter(function(d, i) {
-                return first != d.type;
-            })
-            var selectedText = labels.filter(function(d, i) {
-                return first == d.type;
-            })
-            unselectedText.style("fill", "#ffffff");
-            selectedText.style("fill", "#000000");
-            colorBar.style("fill", function(d) {
-                    return(cScale(d.severity));
+            if(first !== 'all'){
+                var greyBars = bars.filter(function(d, i) {
+                    return first != d.type;
                 })
-            greyBars
-                .style("fill", "#d3d3d3");
+                var colorBar = bars.filter(function(d, i) {
+                    return first == d.type;
+                })
+                var unselectedText = labels.filter(function(d, i) {
+                    return first != d.type;
+                })
+                var selectedText = labels.filter(function(d, i) {
+                    return first == d.type;
+                })
+                unselectedText.style("fill", "#ffffff");
+                selectedText.style("fill", "#000000");
+                colorBar.style("fill", function(d) {
+                        return(cScale(d.severity));
+                    })
+                greyBars
+                    .style("fill", "#d3d3d3");
+            } else {
+                reset_colors();
+            }   
+            
        });
        
         
