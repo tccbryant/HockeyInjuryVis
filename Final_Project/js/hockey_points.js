@@ -1,6 +1,6 @@
 var hockey_player = (function(){
 var dispatcher = d3.dispatch('click', 'hover');
-var csv = 'data/AggregateInjuries(1).csv';  
+var csv = 'Final_Project/data/AggregateInjuries(1).csv';  
 var svg;
 var body_locations = [
     {type: 'Head', left: 119, top: 18},
@@ -265,7 +265,7 @@ function drawBodyPoints(){
         .attr("class", "hockey-player-svg-elem");
     
     var imgs = svg.append("svg:image")
-                .attr("xlink:href", "img/hockey-icon.png")
+                .attr("xlink:href", "Final_Project/img/hockey-icon.png")
                 .attr("x", "0")
                 .attr("y", "0")
                 .attr("width", img_width)

@@ -1,7 +1,8 @@
 var sankey = (function(){
 var node_rects;
-var csv = "data/AggregateInjuries(1).csv";
-var json = "data/sankey.json";
+var csv = "Final_Project/data/AggregateInjuries(1).csv";
+var json = "Final_Project/data/sankey.json";
+var json = "Final_Project/data/sankey.json";
 var units = "injuries";
     
 var isSelected = false;
@@ -134,7 +135,7 @@ function init(dispatcher){
     //load csv data
     
     
-    d3.csv("data/AggregateInjuries(1).csv", function(error, data) {
+    d3.csv(csv, function(error, data) {
 
         data.forEach(function(d,i) {
             d.injuries_d=+d.injuries_d;
@@ -147,7 +148,7 @@ function init(dispatcher){
         
         console.log(data);
         // load the json data
-        d3.json("data/sankey.json", function(error, graph) {
+        d3.json(json, function(error, graph) {
             /*graph.nodes.forEach(function(d,i){
                console.log(d); 
             });*/

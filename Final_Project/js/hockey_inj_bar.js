@@ -37,7 +37,7 @@ function init(dispatcher){
 
 
 
-    d3.csv("data/AggregateInjuries(1).csv", function(error, data) {
+    d3.csv("Final_Project/data/AggregateInjuries(1).csv", function(error, data) {
         data.forEach(function(d) {
             d.type = d.injury_type;
             d.number = +d.num_injuries;
