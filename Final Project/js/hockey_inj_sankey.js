@@ -5,7 +5,6 @@ var json = "data/sankey.json";
 var units = "injuries";
     
 var isSelected = false;
-var lastSelectedNode = -1;
 var highlightedNodes = [...Array(21).keys()]; 
 var yOffset = 30; //500:275
 var xOffset = 50; //500:150
@@ -14,7 +13,7 @@ var xOffset = 50; //500:150
 var colorRange = ['#a50f15', '#de2d26', '#fb6a4a', '#fcae91', '#fee5d9', '#8dd3c7', '#b3de69', '#bebada', '#80b1d3'];
 
 // set the dimensions and margins of the graph
-var margin = {top: 30, right: 10, bottom: 10, left: 10},
+var margin = {top: 30, right: 50, bottom: 10, left: 50},
     width = 1200 -50 - margin.left - margin.right,
     height = 600 -25- margin.top - margin.bottom;
 
@@ -213,11 +212,6 @@ function init(dispatcher){
                 }
                 //console.log(highlightedNodes.indexOf(source_node_num), highlightedNodes.indexOf(target_node_num), highlightedNodes.indexOf(target_node_num)>=0 && highlightedNodes.indexOf(source_node_num)>=0)
                 if(highlightedNodes.indexOf(target_node_num)>=0 && highlightedNodes.indexOf(source_node_num)>=0){
-                    console.log(isSelected);
-                    if(isSelected){ 
-                        d3.select(this).moveToFront();
-                    }
-                    
                     //console.log("mouseover for link btwn ", d.source.name, " and ",d.target.name, "   val: ", format(d.value));
                     //console.log(d);
                     div.transition()
@@ -373,72 +367,71 @@ function init(dispatcher){
 
         function color_selected_node(d,filtered){
             //coloring connected nodes and links based on what we clicked
-                console.log(graph.links[0].value)
-                if(d.node>=8){ // body part nodes
-                    [...Array(21).keys()].forEach( function(d){ //remove color from all nodes
-                            d3.select("#node"+d)
-                                    .style("fill", "#d9d9d9");
-                        })
-                    var debug_color = "#bc80bd"
-                    filtered
-                        .style("fill", get_color(d.node));
-
-
-                    var unselected_nodes = [...Array(21).keys()]
-                    unselected_nodes.splice(d.node,1); //removing self 
-                    lastSelectedNode = d.node;
-                    for(var j = 0; j < graph.links.length; j++){
-                        if( graph.links[j].source.node==d.node && graph.links[j].value !=0){
-                            //right half of the sankey
-                            var dest =graph.links[j].target.node
-                            if( dest == 6){
-                               console.log("goalie injuries: "+graph.links[j].value);
-                            }
-                            var linkID = "#link"+d.node+"_"+dest
-                            d3.select(linkID)
-                                .style("stroke", get_color(dest))
-                                .style("stroke-opacity", 1)
-                                .moveToFront();
-                            d3.select("#node"+dest)
-                                .style("fill", get_color(dest));
-                            unselected_nodes.splice(unselected_nodes.indexOf(dest), 1)
-                        }else if(graph.links[j].target.node==d.node && graph.links[j].value !=0){
-                            //left half of the sankey
-                            var src =graph.links[j].source.node
-                            var linkID = "#link"+src+"_"+d.node
-                            d3.select(linkID)
-                                .style("stroke", get_color(src))
-                                .style("stroke-opacity", 1)
-                                .moveToFront();
-                            d3.select("#node"+src)
-                                .style("fill", get_color(src));
-                            unselected_nodes.splice(unselected_nodes.indexOf(src), 1)
-                        }else{
-                            //grey out links
-                            var src =graph.links[j].source.node;
-                            var dest =graph.links[j].target.node;
-                            var linkID = "#link"+src+"_"+dest;
-                            d3.select(linkID)
-                                .style("stroke", "#000")
-                                .style("stroke-opacity", .05);
-                            /*d3.select("#node"+src)
+            console.log(graph.links[0].value)
+            if(d.node>=8){ // body part nodes
+                [...Array(21).keys()].forEach( function(d){ //remove color from all nodes
+                        d3.select("#node"+d)
                                 .style("fill", "#d9d9d9");
-                            d3.select("#node"+dest)
-                                .style("fill", "#d9d9d9");*/
+                    })
+                var debug_color = "#bc80bd"
+                filtered
+                    .style("fill", get_color(d.node));
 
 
-
+                var unselected_nodes = [...Array(21).keys()]
+                unselected_nodes.splice(d.node,1); //removing self 
+                for(var j = 0; j < graph.links.length; j++){
+                    if( graph.links[j].source.node==d.node && graph.links[j].value !=0){
+                        //right half of the sankey
+                        var dest =graph.links[j].target.node
+                        if( dest == 6){
+                           console.log("goalie injuries: "+graph.links[j].value);
                         }
-                    }
+                        var linkID = "#link"+d.node+"_"+dest
+                        d3.select(linkID)
+                            .style("stroke", get_color(dest))
+                            .style("stroke-opacity", 1)
+                            .moveToFront();
+                        d3.select("#node"+dest)
+                            .style("fill", get_color(dest));
+                        unselected_nodes.splice(unselected_nodes.indexOf(dest), 1)
+                    }else if(graph.links[j].target.node==d.node && graph.links[j].value !=0){
+                        //left half of the sankey
+                        var src =graph.links[j].source.node
+                        var linkID = "#link"+src+"_"+d.node
+                        d3.select(linkID)
+                            .style("stroke", get_color(src))
+                            .style("stroke-opacity", 1)
+                            .moveToFront();
+                        d3.select("#node"+src)
+                            .style("fill", get_color(src));
+                        unselected_nodes.splice(unselected_nodes.indexOf(src), 1)
+                    }else{
+                        //grey out links
+                        var src =graph.links[j].source.node;
+                        var dest =graph.links[j].target.node;
+                        var linkID = "#link"+src+"_"+dest;
+                        d3.select(linkID)
+                            .style("stroke", "#000")
+                            .style("stroke-opacity", .05);
+                        /*d3.select("#node"+src)
+                            .style("fill", "#d9d9d9");
+                        d3.select("#node"+dest)
+                            .style("fill", "#d9d9d9");*/
 
-                    console.log(unselected_nodes);
-                    highlightedNodes = [...Array(21).keys()];
-                    unselected_nodes.forEach(function(d){
-                        highlightedNodes.splice(highlightedNodes.indexOf(d),1);
-                    });
-                    console.log(highlightedNodes);
-                    isSelected = true;
-                } // end if bodypart node
+
+
+                    }
+                }
+
+                console.log(unselected_nodes);
+                highlightedNodes = [...Array(21).keys()];
+                unselected_nodes.forEach(function(d){
+                    highlightedNodes.splice(highlightedNodes.indexOf(d),1);
+                });
+                console.log(highlightedNodes);
+                isSelected = true;
+            } // end if bodypart node
         } // end of function 
             
         function colorAllNodes(){
