@@ -1,5 +1,5 @@
 var hockey_player = (function(){
-var dispatcher = d3.dispatch('click');
+var dispatcher = d3.dispatch('click', 'hover');
 var csv = 'data/AggregateInjuries(1).csv';  
 var svg;
 var body_locations = [
@@ -84,8 +84,11 @@ function bindOnClickPoints(data){
             forward_injuries = (found.injuries_f/found.num_injuries);
 
         d3.select('.injury-type').text(body_part);
-
-        d3.select('.severity').text((found.total_severity / found.num_injuries).toFixed(2));
+        
+        d3.select('.severity').text((found.total_severity / found.num_injuries).toFixed(2))
+        .style('color', 'black')
+        .style('font-size', '2rem')
+        .style('font-weight', 'bold');
 
         d3.select('.inj-list').text(found.notes);
 
@@ -102,6 +105,8 @@ function bindOnClickPoints(data){
         firstSelected = 'all', // cannot set to Upper or Lower Body
         selected,
         button = d3.select('.button'),
+        last_selected_color,
+        current_selected_color, 
         button_selected = false;
     
 //    lastSelection = d3.select("." + firstSelected);
@@ -211,12 +216,7 @@ function bindOnClickPoints(data){
             selected = undefined;
             button_selected = true;
         } 
-//        else {
-//           square
-//            .attr('fill', 'none');
-//            showHideToolTip(false);
-//        }
-//        button_selected = !button_selected; 
+
         dispatcher.call('click', this, 'all');
     });
     

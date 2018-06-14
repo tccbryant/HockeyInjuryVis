@@ -113,7 +113,7 @@ function init(dispatcher){
             });
        
        dispatcher.on('click.player', function(first){
-            if(first !== 'all'){
+           if(first !== 'all'){
                 var greyBars = bars.filter(function(d, i) {
                     return first != d.type;
                 })
@@ -135,9 +135,11 @@ function init(dispatcher){
                     .style("fill", "#d3d3d3");
             } else {
                 reset_colors();
+                d3.select('td.severity').style('background-color', 'gray');
             }   
             
        });
+        
        
         
         var labels = svg.selectAll("text")
@@ -202,6 +204,7 @@ function init(dispatcher){
             .attr("y", -5)
             .text("Injury Severity (Number of Games Missed)");
         
+        var selected_bar;
         d3.selectAll('.body-point').on('click.tooltip', function(){
             var classes = d3.select(this).attr('class').split(/\s/);
             var body_part = classes.length > 2 ? 
@@ -213,7 +216,30 @@ function init(dispatcher){
             d3.select('td.severity').style('background-color', function(){
                return bar.attr('fill');
            });
+            selected_bar = bar;
         });
+        
+        d3.selectAll('.body-point').on('mouseenter.tooltip', function(){
+            var classes = d3.select(this).attr('class').split(/\s/);
+            var body_part = classes.length > 2 ? 
+                classes[1] + " " + classes[2] : classes[1];
+            var bar = bars.filter(function(d,i){
+               return d.type == body_part;
+            });
+            
+            d3.select('td.severity').style('background-color', function(){
+               return bar.attr('fill');
+           });
+        });
+        
+        d3.selectAll('.body-point').on('mouseleave.tooltip', function(){
+            if(selected_bar){
+              d3.select('td.severity').style('background-color', function(){
+                   return selected_bar.attr('fill');
+               });  
+            }
+        });
+        
             
     });
 }
