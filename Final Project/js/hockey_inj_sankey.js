@@ -46,7 +46,22 @@ var path = sankey.link();
 var translation = ["15","13","12","10","7", //based on sev_scale
                    "Forward","Goalie","Defense",
                    "Lower body", "Upper body","Leg", "Head", "Foot", "Hand", "Groin", "Shoulder", "Back", "Face", "Torso", "Arm", "Neck"]
-    
+  
+// https://github.com/wbkd/d3-extended
+d3.selection.prototype.moveToFront = function() {  
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+d3.selection.prototype.moveToBack = function() {  
+    return this.each(function() { 
+        var firstChild = this.parentNode.firstChild; 
+        if (firstChild) { 
+            this.parentNode.insertBefore(this, firstChild); 
+        } 
+    });
+};
+
 function getInjuryCSV(csv){
     return new Promise(function(resolve, reject){
         d3.csv(csv, function(error,data){
@@ -198,7 +213,10 @@ function init(dispatcher){
                 }
                 //console.log(highlightedNodes.indexOf(source_node_num), highlightedNodes.indexOf(target_node_num), highlightedNodes.indexOf(target_node_num)>=0 && highlightedNodes.indexOf(source_node_num)>=0)
                 if(highlightedNodes.indexOf(target_node_num)>=0 && highlightedNodes.indexOf(source_node_num)>=0){
-                    
+                    console.log(isSelected);
+                    if(isSelected){ 
+                        d3.select(this).moveToFront();
+                    }
                     
                     //console.log("mouseover for link btwn ", d.source.name, " and ",d.target.name, "   val: ", format(d.value));
                     //console.log(d);
@@ -210,12 +228,12 @@ function init(dispatcher){
                     
                 
                     //console.log( target_node_num, source_node_num, "  are in ", highlightedNodes);
-                    console.log(d3.mouse(this));
+                    //console.log(d3.mouse(this));
                     if( translation.indexOf(d.source.name) <5){
                         //console.log("<<<<<<<<<<<<[[",translation.indexOf(d.source.name),"]]")
                         var current_severity = 0;
-                        console.log(d)
-                        data.forEach(function(x){ if(d.target.name == x.type){current_severity=x.severity;console.log(x.severity);}})
+                        //console.log(d)
+                        data.forEach(function(x){ if(d.target.name == x.type){current_severity=x.severity;}})
                         mouseover_div.html( "<b>"+ format(d.value)+" "+ d.target.name +" injuries<br>"+
                                             "Average number of games missed: "+current_severity.toFixed(2)+"</b>")
                                      .style("top", (d3.mouse(this)[1]) + "px")
@@ -267,12 +285,12 @@ function init(dispatcher){
             .style("fill", function(d) { return d.color = get_color(d.node);})
             .on("mouseover", function(d) {
 
-                console.log("mouseover for ", d.name, d.value, d3.mouse(this))
+                //console.log("mouseover for ", d.name, d.value, d3.mouse(this))
 
                 div.transition()
                     .duration(200)
                     .style("opacity", .95);
-                console.log(d3.event)
+                //console.log(d3.event)
                 var mouseover_div = div.style("left", (d3.event.layerX-xOffset) + "px")
                                         .style("top", (d3.event.layerY-yOffset) + "px");
                 if( translation.indexOf(d.name) <5){
@@ -354,9 +372,7 @@ function init(dispatcher){
 
 
         function color_selected_node(d,filtered){
-            if( isSelected && d.node == lastSelectedNode){
-                colorAllNodes();
-            }else{//coloring connected nodes and links based on what we clicked
+            //coloring connected nodes and links based on what we clicked
                 console.log(graph.links[0].value)
                 if(d.node>=8){ // body part nodes
                     [...Array(21).keys()].forEach( function(d){ //remove color from all nodes
@@ -381,7 +397,8 @@ function init(dispatcher){
                             var linkID = "#link"+d.node+"_"+dest
                             d3.select(linkID)
                                 .style("stroke", get_color(dest))
-                                .style("stroke-opacity", 1);
+                                .style("stroke-opacity", 1)
+                                .moveToFront();
                             d3.select("#node"+dest)
                                 .style("fill", get_color(dest));
                             unselected_nodes.splice(unselected_nodes.indexOf(dest), 1)
@@ -391,7 +408,8 @@ function init(dispatcher){
                             var linkID = "#link"+src+"_"+d.node
                             d3.select(linkID)
                                 .style("stroke", get_color(src))
-                                .style("stroke-opacity", 1);
+                                .style("stroke-opacity", 1)
+                                .moveToFront();
                             d3.select("#node"+src)
                                 .style("fill", get_color(src));
                             unselected_nodes.splice(unselected_nodes.indexOf(src), 1)
@@ -421,7 +439,6 @@ function init(dispatcher){
                     console.log(highlightedNodes);
                     isSelected = true;
                 } // end if bodypart node
-            } // end if/else (isSelected)
         } // end of function 
             
         function colorAllNodes(){
@@ -475,3 +492,6 @@ return {
 }; 
 })()
 
+//sources used:
+// http://bl.ocks.org/eesur/4e0a69d57d3bfc8a82c2
+// https://bl.ocks.org/d3noob/013054e8d7807dff76247b81b0e29030
