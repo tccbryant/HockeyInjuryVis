@@ -3,6 +3,10 @@ var node_rects;
 var csv = "data/AggregateInjuries(1).csv";
 var json = "data/sankey.json";
 var units = "injuries";
+    
+var isSelected = false;
+var lastSelectedNode = -1;
+var highlightedNodes = [...Array(21).keys()]; 
 
 //color scale data
 var colorRange = ['#a50f15', '#de2d26', '#fb6a4a', '#fcae91', '#fee5d9', '#8dd3c7', '#b3de69', '#bebada', '#80b1d3'];
@@ -207,11 +211,43 @@ function init(){
             .style("stroke-width", function(d) { return Math.max(0, d.dy); });
             
 
-        // add the link titles
-        link.append("title")
+        // add the link mouseover
+        link.on("mouseover", function(d) {
+                target_node_num = translation.indexOf(d.target.name);
+                source_node_num = translation.indexOf(d.source.name);
+                if(highlightedNodes.indexOf(target_node_num)>0 && highlightedNodes.indexOf(source_node_num)>0){
+                    console.log("mouseover for link btwn ", d.source.name, " and ",d.target.name, "   val: ", format(d.value));
+                    console.log(d);
+                    div.transition()
+                        .duration(200)
+                        .style("opacity", .95);
+
+                    var mouseover_div = div.html( "<b>"+ format(d.value)+"</b>");
+                    
+                
+                    console.log( target_node_num, source_node_num, "  are in ", highlightedNodes);
+                    if( translation.indexOf(d.source.name) <5){
+                        console.log("<<<<<<<<<<<<[[",translation.indexOf(d.source.name),"]]")
+                        mouseover_div.style("top", d.source.y/*(d3.event.pageY)*/ + "px")
+                                     .style("left", d.source.x/*(d3.event.pageX)*/ + "px");
+                    }else{
+                        console.log(">>>>>>>>>>>>[[",translation.indexOf(d.source.name),"]]")
+                        mouseover_div.style("top", d.target.y/*(d3.event.pageY)*/ + "px")
+                                     .style("left", d.target.x/*(d3.event.pageX)*/ + "px");
+                    }
+                }//////////////////////////
+                                        
+                
+                    
+            })
+            .on("mouseout", function(d) {
+                div.transition()
+                   .duration(500)
+                   .style("opacity", 0);
+            })/*.append("title")
             .text(function(d) {
                 return d.source.name + " → " + 
-                    d.target.name + "\n" + format(d.value); });
+                    d.target.name + "\n" + format(d.value); });*/
 
         // add in the nodes
         var node = svg.append("g").selectAll(".node")
@@ -220,14 +256,6 @@ function init(){
             .attr("class", "node")
             .attr("transform", function(d) { 
                 return "translate(" + d.x + "," + d.y + ")"; });
-            /*.call(d3.drag()
-            .subject(function(d) {
-                return d;
-            })
-            .on("start", function() {
-              this.parentNode.appendChild(this);
-            })
-            .on("drag", dragmove));*/
 
         // add the rectangles for the nodes
         node.append("rect")
@@ -237,7 +265,6 @@ function init(){
             .style("fill", function(d) { return d.color = get_color(d.node);})
             .on("mouseover", function(d) {
                 console.log("mouseover for ", d.name, d.value)
-                console.log(d);
                 div.transition()
                     .duration(200)
                     .style("opacity", .95);
@@ -299,78 +326,96 @@ function init(){
             .text("Position")
             .attr("text-anchor", "middle");
 
-        // the function for moving the nodes
-        function dragmove(d) {
-        d3.select(this)
-          .attr("transform", 
-                "translate(" 
-                   + d.x + "," 
-                   + (d.y = Math.max(
-                      0, Math.min(height - d.dy, d3.event.y))
-                     ) + ")");
-        sankey.relayout();
-        link.attr("d", path);
-        }
 
         function color_selected_node(d){
-            //coloring connected nodes and links based on what we clicked
-            console.log(graph.links[0].value)
-            if(d.node>=8){ // body part nodes
-                [...Array(21).keys()].forEach( function(d){ //remove color from all nodes
-                        d3.select("#node"+d)
+            if( isSelected && d.node == lastSelectedNode){
+                colorAllNodes();
+            }else{//coloring connected nodes and links based on what we clicked
+                console.log(graph.links[0].value)
+                if(d.node>=8){ // body part nodes
+                    [...Array(21).keys()].forEach( function(d){ //remove color from all nodes
+                            d3.select("#node"+d)
+                                    .style("fill", "#d9d9d9");
+                        })
+                    var debug_color = "#bc80bd"
+                    d3.select(this)
+                        .style("fill", get_color(d.node));
+
+
+                    var unselected_nodes = [...Array(21).keys()]
+                    unselected_nodes.splice(d.node,1); //removing self 
+                    lastSelectedNode = d.node;
+                    for(var j = 0; j < graph.links.length; j++){
+                        if( graph.links[j].source.node==d.node && graph.links[j].value !=0){
+                            //right half of the sankey
+                            var dest =graph.links[j].target.node
+                            if( dest == 6){
+                               console.log("goalie injuries: "+graph.links[j].value);
+                            }
+                            var linkID = "#link"+d.node+"_"+dest
+                            d3.select(linkID)
+                                .style("stroke", get_color(dest))
+                                .style("stroke-opacity", 1);
+                            d3.select("#node"+dest)
+                                .style("fill", get_color(dest));
+                            unselected_nodes.splice(unselected_nodes.indexOf(dest), 1)
+                        }else if(graph.links[j].target.node==d.node && graph.links[j].value !=0){
+                            //left half of the sankey
+                            var src =graph.links[j].source.node
+                            var linkID = "#link"+src+"_"+d.node
+                            d3.select(linkID)
+                                .style("stroke", get_color(src))
+                                .style("stroke-opacity", 1);
+                            d3.select("#node"+src)
+                                .style("fill", get_color(src));
+                            unselected_nodes.splice(unselected_nodes.indexOf(src), 1)
+                        }else{
+                            //grey out links
+                            var src =graph.links[j].source.node;
+                            var dest =graph.links[j].target.node;
+                            var linkID = "#link"+src+"_"+dest;
+                            d3.select(linkID)
+                                .style("stroke", "#000")
+                                .style("stroke-opacity", .05);
+                            /*d3.select("#node"+src)
                                 .style("fill", "#d9d9d9");
-                    })
-                var debug_color = "#bc80bd"
-                d3.select(this)
-                    .style("fill", get_color(d.node));
-                
-                
-                var unselected_nodes = [...Array(21).keys()]
-                unselected_nodes.splice(d.node,1); //removing self 
-                for(var j = 0; j < graph.links.length; j++){
-                    if( graph.links[j].source.node==d.node && graph.links[j].value !=0){
-                        //right half of the sankey
-                        var dest =graph.links[j].target.node
-                        if( dest == 6){
-                           console.log("goalie injuries: "+graph.links[j].value);
+                            d3.select("#node"+dest)
+                                .style("fill", "#d9d9d9");*/
+
+
                         }
-                        var linkID = "#link"+d.node+"_"+dest
-                        d3.select(linkID)
-                            .style("stroke", get_color(dest))
-                            .style("stroke-opacity", 1);
-                        d3.select("#node"+dest)
-                            .style("fill", get_color(dest));
-                        unselected_nodes.splice(unselected_nodes.indexOf(dest), 1)
-                    }else if(graph.links[j].target.node==d.node && graph.links[j].value !=0){
-                        //left half of the sankey
-                        var src =graph.links[j].source.node
-                        var linkID = "#link"+src+"_"+d.node
-                        d3.select(linkID)
-                            .style("stroke", get_color(src))
-                            .style("stroke-opacity", 1);
-                        d3.select("#node"+src)
-                            .style("fill", get_color(src));
-                        unselected_nodes.splice(unselected_nodes.indexOf(src), 1)
-                    }else{
-                        //grey out links
-                        var src =graph.links[j].source.node;
-                        var dest =graph.links[j].target.node;
-                        var linkID = "#link"+src+"_"+dest;
-                        d3.select(linkID)
-                            .style("stroke", "#000")
-                            .style("stroke-opacity", .05);
-                        /*d3.select("#node"+src)
-                            .style("fill", "#d9d9d9");
-                        d3.select("#node"+dest)
-                            .style("fill", "#d9d9d9");*/
-
-
                     }
-                }
-                console.log(unselected_nodes)
-
+                    console.log(unselected_nodes);
+                    highlightedNodes = [...Array(21).keys()];
+                    unselected_nodes.forEach(function(d){
+                        highlightedNodes.splice(highlightedNodes.indexOf(d),1);
+                    });
+                    console.log(highlightedNodes);
+                    isSelected = true;
+                } // end if bodypart node
+            } // end if/else (isSelected)
+        } // end of function 
+            
+        function colorAllNodes(){
+            [...Array(21).keys()].forEach( function(d){ //color all nodes
+                d3.select("#node"+d)
+                        .style("fill", get_color(d));
+            })
+            
+            for(var j = 0; j < graph.links.length; j++){
+                var src =graph.links[j].source.node;
+                var dest =graph.links[j].target.node;
+                var linkID = "#link"+src+"_"+dest;
+                d3.select(linkID) // I think something is misssing here
+                    .style("fill", "none")
+                    .style("stroke", "#000")
+                    .style("stroke-opacity", .2);
             }
+            
+            isSelected = false;
+            highlightedNodes = [...Array(21).keys()]; 
         }
+            
         });
     });
 
