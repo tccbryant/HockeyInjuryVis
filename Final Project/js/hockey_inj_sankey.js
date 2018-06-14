@@ -25,6 +25,10 @@ var svg = d3.select(".sankey").append("svg")
         .attr("transform", 
           "translate(" + margin.left + "," + margin.top + ")");
 
+var div = d3.select(".sankey").append("div")
+            .attr("class", "tooltip")
+            .style("opacity", 0);    
+    
 var node_width = 75;
 // Set the sankey diagram properties
 var sankey = d3.sankey()
@@ -33,8 +37,8 @@ var sankey = d3.sankey()
 
 var path = sankey.link();
 
-var translation = ["15","13","12","9","8", //based on sev_scale
-                   "F","G","D",
+var translation = ["15","13","12","10","7", //based on sev_scale
+                   "Forward","Goalie","Defense",
                    "Lower body", "Upper body","Leg", "Head", "Foot", "Hand", "Groin", "Shoulder", "Back", "Face", "Torso", "Arm", "Neck"]
     
 function getInjuryCSV(csv){
@@ -229,19 +233,41 @@ function init(){
         node.append("rect")
             .attr("height", function(d) { return d.dy; })
             .attr("width", sankey.nodeWidth())
-            .attr("id", function(d) {
-                return "node"+ d.node;
+            .attr("id", function(d) {return "node"+ d.node;})
+            .style("fill", function(d) { return d.color = get_color(d.node);})
+            .on("mouseover", function(d) {
+                console.log("mouseover for ", d.name, d.value)
+                console.log(d);
+                div.transition()
+                    .duration(200)
+                    .style("opacity", .95);
+            
+                var mouseover_div = div.style("left", d.x/*(d3.event.pageX)*/ + "px")
+                                        .style("top", d.y/*(d3.event.pageY)*/ + "px");
+                if( translation.indexOf(d.name) <5){
+                    console.log(d.name, " is a severity", translation.indexOf(d.name));
+                    mouseover_div.html( "<b><center>Severity: "+d.name+"</center>"+
+                         "</br>"+ format(d.value)+"</b>")
+                }else if( translation.indexOf(d.name) <8){
+                    console.log(d.name, " is a position")
+                    mouseover_div.html( "<b><center>Position: "+d.name+"</center>"+
+                         "</br>"+ format(d.value)+"</b>")
+                }else{
+                    console.log(d.name, " is a body part")
+                    mouseover_div.html( "<b><center>Body Part: "+d.name+"</center>"+
+                         "</br>"+ format(d.value)+"</b>")
+                }
+                
+                    
             })
-            .style("fill", function(d) { 
-                //console.log(d)
-                return d.color = get_color(d.node);})
-                //return d.color = color(d.name.replace(/ .*/, "")); })
+            .on("mouseout", function(d) {
+                div.transition()
+                   .duration(500)
+                   .style("opacity", 0);
+            })
             .style("stroke", function(d) { 
                 return d3.rgb(d.color).darker(2); })
             .on("click", color_selected_node)
-            .append("title")
-            .text(function(d) { 
-                return d.name + "\n" + format(d.value); });
 
         // add in the title for the nodes
         node.append("text")
@@ -359,9 +385,9 @@ function init(){
     }
 }
 function sev_scale(num){
-    if( num < 8){
+    if( num < 7){
         return 4;
-    }else if( num < 9){
+    }else if( num < 10){
         return 3;
     }else if( num < 12){
         return 2;
