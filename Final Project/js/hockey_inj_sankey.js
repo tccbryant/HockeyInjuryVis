@@ -222,12 +222,12 @@ function init(){
                     d3.select(linkID) // I think something is misssing here
                         .style("stroke-opacity", .5);
                 }
-            
-                if(highlightedNodes.indexOf(target_node_num)>0 && highlightedNodes.indexOf(source_node_num)>0){
+                console.log(highlightedNodes.indexOf(source_node_num), highlightedNodes.indexOf(target_node_num), highlightedNodes.indexOf(target_node_num)>=0 && highlightedNodes.indexOf(source_node_num)>=0)
+                if(highlightedNodes.indexOf(target_node_num)>=0 && highlightedNodes.indexOf(source_node_num)>=0){
                     
                     
                     console.log("mouseover for link btwn ", d.source.name, " and ",d.target.name, "   val: ", format(d.value));
-                    console.log(d);
+                    //console.log(d);
                     div.transition()
                         .duration(200)
                         .style("opacity", .95);
@@ -237,11 +237,11 @@ function init(){
                 
                     console.log( target_node_num, source_node_num, "  are in ", highlightedNodes);
                     if( translation.indexOf(d.source.name) <5){
-                        console.log("<<<<<<<<<<<<[[",translation.indexOf(d.source.name),"]]")
+                        //console.log("<<<<<<<<<<<<[[",translation.indexOf(d.source.name),"]]")
                         mouseover_div.style("top", d.source.y/*(d3.event.pageY)*/ + "px")
                                      .style("left", d.source.x/*(d3.event.pageX)*/ + "px");
                     }else{
-                        console.log(">>>>>>>>>>>>[[",translation.indexOf(d.source.name),"]]")
+                        //console.log(">>>>>>>>>>>>[[",translation.indexOf(d.source.name),"]]")
                         mouseover_div.style("top", d.target.y/*(d3.event.pageY)*/ + "px")
                                      .style("left", d.target.x/*(d3.event.pageX)*/ + "px");
                     }
