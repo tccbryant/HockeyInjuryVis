@@ -5,7 +5,7 @@ var json = "data/sankey.json";
 var units = "injuries";
 
 //color scale data
-var colorRange = ['#fee5d9', '#fcae91', '#fb6a4a', '#de2d26', '#a50f15', '#8dd3c7', '#b3de69', '#bebada', '#80b1d3'];
+var colorRange = ['#a50f15', '#de2d26', '#fb6a4a', '#fcae91', '#fee5d9', '#8dd3c7', '#b3de69', '#bebada', '#80b1d3'];
 
 // set the dimensions and margins of the graph
 var margin = {top: 30, right: 10, bottom: 10, left: 10},
@@ -33,7 +33,7 @@ var sankey = d3.sankey()
 
 var path = sankey.link();
 
-var translation = ["8","9","12","13","15", //based on sev_scale
+var translation = ["15","13","12","9","8", //based on sev_scale
                    "F","G","D",
                    "Lower body", "Upper body","Leg", "Head", "Foot", "Hand", "Groin", "Shoulder", "Back", "Face", "Torso", "Arm", "Neck"]
     
@@ -360,15 +360,15 @@ function init(){
 }
 function sev_scale(num){
     if( num < 8){
-        return 0;
+        return 4;
     }else if( num < 9){
-        return 1;
+        return 3;
     }else if( num < 12){
         return 2;
     }else if( num < 13){
-        return 3;
+        return 1;
     }else{
-        return 4
+        return 0
     }
 }
 return {
