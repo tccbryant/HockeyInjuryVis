@@ -215,7 +215,17 @@ function init(){
         link.on("mouseover", function(d) {
                 target_node_num = translation.indexOf(d.target.name);
                 source_node_num = translation.indexOf(d.source.name);
+            
+                var linkID = "#link"+source_node_num+"_"+target_node_num;
+                
+                if( !isSelected){
+                    d3.select(linkID) // I think something is misssing here
+                        .style("stroke-opacity", .5);
+                }
+            
                 if(highlightedNodes.indexOf(target_node_num)>0 && highlightedNodes.indexOf(source_node_num)>0){
+                    
+                    
                     console.log("mouseover for link btwn ", d.source.name, " and ",d.target.name, "   val: ", format(d.value));
                     console.log(d);
                     div.transition()
@@ -241,6 +251,15 @@ function init(){
                     
             })
             .on("mouseout", function(d) {
+                target_node_num = translation.indexOf(d.target.name);
+                source_node_num = translation.indexOf(d.source.name);
+            
+                var linkID = "#link"+source_node_num+"_"+target_node_num;
+                if( !isSelected){
+                    d3.select(linkID)
+                        .style("stroke-opacity", .2);
+                }
+            
                 div.transition()
                    .duration(500)
                    .style("opacity", 0);
