@@ -1,4 +1,5 @@
 var hockey_player = (function(){
+var dispatcher = d3.dispatch('click');
 var csv = 'data/AggregateInjuries(1).csv';  
 var svg;
 var body_locations = [
@@ -77,10 +78,9 @@ function bindOnClickPoints(data){
     //****************************************
     var lastSelection, // create a closure to save the value of the element somewhere
         firstSelected = 'Leg', // cannot set to Upper or Lower Body
-        selected; 
-        
+        selected;
     lastSelection = d3.select("." + firstSelected);
-    lastSelection.attr('fill','red');
+    lastSelection.attr('fill','#ad1313');
     var first_found = data.find(function(element){
         return firstSelected === element.injury_type;
     });
@@ -108,8 +108,9 @@ function bindOnClickPoints(data){
         if(found) {
             writeTextToToolTip(body_part, found);
             selected = currentSelection;
+            dispatcher.call('click', this, body_part);
         }
-        currentSelection.attr('fill','red');
+        currentSelection.attr('fill','#ad1313');
         lastSelection = d3.select(this);
     });
     
@@ -128,14 +129,14 @@ function bindOnClickPoints(data){
         if(found) {
             writeTextToToolTip(body_part, found);   
         }
-        currentSelection.attr('fill','red');
+        currentSelection.attr('fill','#ff7f7f');
     });
     
     d3.selectAll('.body-point').on('mouseleave', function(){
         if(lastSelection){
             d3.select(this).attr('fill', 'none');
             if(selected){
-                selected.attr('fill', 'red');
+                selected.attr('fill', '#ad1313');
             }
             var classes = lastSelection.attr('class').split(/\s/),
             
@@ -167,7 +168,8 @@ function drawCircles(data){
 		.attr('cx', function (d) { return d.left; })
 		.attr('cy', function (d) { return d.top; })
         .attr('r', function(d){return 7;})
-        .attr('stroke', 'red')
+        .attr('stroke', '#ad1313')
+        .attr('stroke-width', 2)
         .style("pointer-events","visible")
         .attr('fill', 'none')
     
@@ -197,6 +199,8 @@ function drawBodyPoints(){
     getInjuryData(csv).then(mergeCSVandPoints).then(function(data){
         drawCircles(data);
         bindOnClickPoints(data);
+        bar_chart.init(dispatcher);
+        sankey.init(dispatcher);
     })
     
      
@@ -206,6 +210,8 @@ function drawBodyPoints(){
 return {
     printXY: printXY,
     draw: drawBodyPoints,
+    dispatcher: dispatcher,
+     
 }
 })()
 hockey_player.draw();

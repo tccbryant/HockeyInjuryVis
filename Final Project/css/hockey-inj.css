@@ -1,6 +1,6 @@
 .tool-tip {
     position: absolute;
-    top: 20%;
+    top: 30%;
     left: -50px;
     background: rgb(205, 208, 214);
     width: 180px;
@@ -10,7 +10,7 @@
     word-wrap: break-word;
     table-layout: fixed;
     width: 180px;
-    height:300px;
+    height:200px;
 }
 .tool-tip tr td:first-child{
     text-align: left;

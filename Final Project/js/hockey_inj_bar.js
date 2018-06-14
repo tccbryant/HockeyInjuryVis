@@ -1,16 +1,14 @@
 var bar_chart = (function(){
-function init(){
+function init(dispatcher){
     /*
     TODO:
     1 - can select bars to grey out other bars
     2 - 2 modes, stacked bar and severity
     */
-
     //define the margins
     var margin = {top: 10, right: 40, bottom: 150, left: 70},
         width = 760 - margin.left - margin.right,
         height = 510 - margin.top - margin.bottom;
-
     //define the svg
     var svg = d3.select(".bar-chart").append("svg") //will need to change body to something else
         .attr("width", width + margin.left + margin.right)
@@ -66,6 +64,8 @@ function init(){
 
         //draw the bars
         var bars = svg.selectAll("rect")
+            .append('g')
+            .attr('class','bars')
             .data(data)
             .enter()
             .append("rect")
@@ -75,28 +75,28 @@ function init(){
             .attr("x", function(d) {
                 return xScale(d.type);
             })
-            .on("click", function(d, i) {
-                var dat = d;
-                var greyBars = bars.filter(function(d, i) {
-                    return dat.type != d.type;
-                })
-                var colorBar = bars.filter(function(d, i) {
-                    return dat.type == d.type;
-                })
-                var unselectedText = labels.filter(function(d, i) {
-                    return dat.type != d.type;
-                })
-                var selectedText = labels.filter(function(d, i) {
-                    return dat.type == d.type;
-                })
-                unselectedText.style("fill", "#ffffff");
-                selectedText.style("fill", "#000000");
-                colorBar.style("fill", function(d) {
-                        return(cScale(d.severity));
-                    })
-                greyBars
-                    .style("fill", "#d3d3d3");
-            })
+//            .on("click", function(d, i) {
+//                var dat = d;
+//                var greyBars = bars.filter(function(d, i) {
+//                    return dat.type != d.type;
+//                })
+//                var colorBar = bars.filter(function(d, i) {
+//                    return dat.type == d.type;
+//                })
+//                var unselectedText = labels.filter(function(d, i) {
+//                    return dat.type != d.type;
+//                })
+//                var selectedText = labels.filter(function(d, i) {
+//                    return dat.type == d.type;
+//                })
+//                unselectedText.style("fill", "#ffffff");
+//                selectedText.style("fill", "#000000");
+//                colorBar.style("fill", function(d) {
+//                        return(cScale(d.severity));
+//                    })
+//                greyBars
+//                    .style("fill", "#d3d3d3");
+//            })
             .attr("y", function(d) {
                 return yScale(d.number);
             })
@@ -106,6 +106,30 @@ function init(){
             .attr("fill", function(d) {
                 return(cScale(d.severity));
             });
+       
+       dispatcher.on('click.player', function(first){
+                
+            var greyBars = bars.filter(function(d, i) {
+                return first != d.type;
+            })
+            var colorBar = bars.filter(function(d, i) {
+                return first == d.type;
+            })
+            var unselectedText = labels.filter(function(d, i) {
+                return first != d.type;
+            })
+            var selectedText = labels.filter(function(d, i) {
+                return first == d.type;
+            })
+            unselectedText.style("fill", "#ffffff");
+            selectedText.style("fill", "#000000");
+            colorBar.style("fill", function(d) {
+                    return(cScale(d.severity));
+                })
+            greyBars
+                .style("fill", "#d3d3d3");
+       });
+       
         
         var labels = svg.selectAll("text")
             .data(data)
@@ -168,6 +192,19 @@ function init(){
             .attr("text-anchor", "start")
             .attr("y", -5)
             .text("Injury Severity (Number of Games Missed)");
+        
+        d3.selectAll('.body-point').on('click.tooltip', function(){
+            var classes = d3.select(this).attr('class').split(/\s/);
+            var body_part = classes.length > 2 ? 
+                classes[1] + " " + classes[2] : classes[1];
+            var bar = bars.filter(function(d,i){
+               return d.type == body_part;
+            });
+            
+            d3.select('td.severity').style('background-color', function(){
+               return bar.attr('fill');
+           });
+        });
             
     });
 }
@@ -175,4 +212,3 @@ function init(){
         init: init,
     }
 })()
-bar_chart.init();
