@@ -7,8 +7,8 @@ var units = "injuries";
 var isSelected = false;
 var lastSelectedNode = -1;
 var highlightedNodes = [...Array(21).keys()]; 
-var yOffset = 175; //500:275
-var xOffset = 150; //500:150
+var yOffset = 30; //500:275
+var xOffset = 50; //500:150
 
 //color scale data
 var colorRange = ['#a50f15', '#de2d26', '#fb6a4a', '#fcae91', '#fee5d9', '#8dd3c7', '#b3de69', '#bebada', '#80b1d3'];
@@ -195,11 +195,11 @@ function init(dispatcher){
                     d3.select(linkID) // I think something is misssing here
                         .style("stroke-opacity", .5);
                 }
-                console.log(highlightedNodes.indexOf(source_node_num), highlightedNodes.indexOf(target_node_num), highlightedNodes.indexOf(target_node_num)>=0 && highlightedNodes.indexOf(source_node_num)>=0)
+                //console.log(highlightedNodes.indexOf(source_node_num), highlightedNodes.indexOf(target_node_num), highlightedNodes.indexOf(target_node_num)>=0 && highlightedNodes.indexOf(source_node_num)>=0)
                 if(highlightedNodes.indexOf(target_node_num)>=0 && highlightedNodes.indexOf(source_node_num)>=0){
                     
                     
-                    console.log("mouseover for link btwn ", d.source.name, " and ",d.target.name, "   val: ", format(d.value));
+                    //console.log("mouseover for link btwn ", d.source.name, " and ",d.target.name, "   val: ", format(d.value));
                     //console.log(d);
                     div.transition()
                         .duration(200)
@@ -208,15 +208,16 @@ function init(dispatcher){
                     var mouseover_div = div.html( "<b>"+ format(d.value)+" injuries</b>");
                     
                 
-                    console.log( target_node_num, source_node_num, "  are in ", highlightedNodes);
+                    //console.log( target_node_num, source_node_num, "  are in ", highlightedNodes);
+                    console.log(d3.mouse(this));
                     if( translation.indexOf(d.source.name) <5){
                         //console.log("<<<<<<<<<<<<[[",translation.indexOf(d.source.name),"]]")
-                        mouseover_div.style("top", (d3.event.clientY-yOffset) + "px")
-                                     .style("left", (d3.event.clientX-xOffset) + "px");
+                        mouseover_div.style("top", (d3.mouse(this)[1]) + "px")
+                                     .style("left", (d3.mouse(this)[0]) + "px");
                     }else{
                         //console.log(">>>>>>>>>>>>[[",translation.indexOf(d.source.name),"]]")
-                        mouseover_div.style("top", (d3.event.clientY-yOffset) + "px")
-                                     .style("left", (d3.event.clientX-xOffset) + "px");
+                        mouseover_div.style("top", (d3.mouse(this)[1]) + "px")
+                                     .style("left", (d3.mouse(this)[0]) + "px");
                     }
                 }//////////////////////////
                                         
@@ -258,28 +259,28 @@ function init(dispatcher){
             .style("fill", function(d) { return d.color = get_color(d.node);})
             .on("mouseover", function(d) {
 
-                console.log("mouseover for ", d.name, d.value)
+                console.log("mouseover for ", d.name, d.value, d3.mouse(this))
 
                 div.transition()
                     .duration(200)
                     .style("opacity", .95);
-            
-                var mouseover_div = div.style("left", (d3.event.clientX-xOffset) + "px")
-                                        .style("top", (d3.event.clientY-yOffset) + "px");
+                console.log(d3.event)
+                var mouseover_div = div.style("left", (d3.event.layerX-xOffset) + "px")
+                                        .style("top", (d3.event.layerY-yOffset) + "px");
                 if( translation.indexOf(d.name) <5){
 
-                    console.log(d.name, " is a severity", translation.indexOf(d.name));
+                    //console.log(d.name, " is a severity", translation.indexOf(d.name));
                     mouseover_div.html( "<b>Total injuries of this severity level: "+format(d.value))
                         //"<b><p>Severity: "+d.name+"</p>"+
                          //format(d.value)+"</b>")
                 }else if( translation.indexOf(d.name) <8){
-                    console.log(d.name, " is a position")
+                    //console.log(d.name, " is a position")
                     mouseover_div.html( "<b>Total "+d.name+" injuries: "+ format(d.value))
                         //"<b>Position: "+d.name+""+
                          //"</br>"+ format(d.value)+"</b>")
 
                 }else{
-                    console.log(d.name, " is a body part")
+                    //console.log(d.name, " is a body part")
                     mouseover_div.html( "<b>Total "+d.name+" injuries: "+ format(d.value))
                         //"<b><center>Body Part: "+d.name+"</center>"+
                          //"</br>"+ format(d.value)+"</b>")
